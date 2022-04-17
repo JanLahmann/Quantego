@@ -24,5 +24,9 @@ Optional modifications might be to replace some of the 2x4 bricks (step 3) with 
 
 In case you modify the model - or build you own quantum computer model - please let us know by creating an issue or pull request.
 
+## RasQberry
+
+In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantummm computing software framework), have a look at http://rasqberry.org.
+
 ---
 This GitHub project is not affiliated in any way with Lego nor bricklink. 
