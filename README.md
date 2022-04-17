@@ -10,7 +10,7 @@ Optional modifications might be to replace some of the 2x4 bricks (step 3) with 
 
 Colors are black for the 2x4 and 8x8 bricks, "trans-clear" for the panels (i.e. glass windows), and white for the other three types of bricks. 
 
-The instructions have been created with the http://stud.io lego digital design software. Part numbers are as on https://www.bricklink.com/.
+The [instructions](lego-quantego-v04b.pdf) have been created with the http://stud.io lego digital design software. Part numbers are as on https://www.bricklink.com/.
 
 ---
 
