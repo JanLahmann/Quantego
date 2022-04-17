@@ -24,6 +24,10 @@ Optional modifications might be to replace some of the 2x4 bricks (step 3) with 
 
 In case you modify the model - or build you own quantum computer model - please let us know by creating an issue or pull request.
 
+## Kits
+
+We are in working with a supplier who will provide complete kits with the above parts. These are planned to become available in late May 2022. URL will be posted here.
+
 ## RasQberry
 
 In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantummm computing software framework), have a look at http://rasqberry.org.
