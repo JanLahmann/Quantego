@@ -30,3 +30,5 @@ In case you would like to build a **functional model** of the IBM Quantum System
 
 ---
 This GitHub project is not affiliated in any way with Lego nor bricklink. 
+LEGO and BrickLink are trademarks of the LEGO Group.
+
