@@ -20,7 +20,7 @@ The [instructions](lego-quantego-v04b.pdf) have been created with the http://stu
 
 ## Modifications
 
-Optional modifications might be to replace some of the 2x4 bricks (step 3) with 2x2 bricks to improve stability of the rack, or to replace the 8x8 bricks (step 2 and step 5) with 2x4 bricks which might be easier and cheaper to buy. In that case, 2x4 tiles can be added to improve stability of the top and base.
+Optional modifications might be replacing some of the 2x4 bricks (step 3) with 2x2 bricks to improve stability of the rack, or replacing the 8x8 bricks (step 2 and step 5) with 2x4 bricks which might be easier and cheaper to buy. In that case, 2x4 tiles can be added to improve stability of the top and base.
 
 In case you modify the model - or build you own quantum computer model - please let us know by creating an issue or pull request.
 
