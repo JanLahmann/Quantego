@@ -8,7 +8,13 @@ It has been mentioned first on LinkedIn in [December 2021](https://www.linkedin.
   <img src="1_20220414_121449.jpg" alt="Quantego" width="300"/>
 </p>
 
-This GitHub repo features a slightly simplified version made of 20 bricks.
+This GitHub repo features a slightly simplified version made of 20 bricks:
+
+<p align="center">
+  <img src="LEGO-Quantego-v04b.png" alt="Quantego" width="250"/>
+  <img src="LEGO-Quantego-v04b_2.png" alt="Quantego" width="250"/>
+  <img src="LEGO-Quantego-v04b_3.png" alt="Quantego" width="250"/>
+</p>
 
 ## Instructions
 
