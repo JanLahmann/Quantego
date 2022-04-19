@@ -20,12 +20,16 @@ This GitHub repo features a slightly simplified version made of 20 bricks:
 
 The [instructions](lego-quantego-v04b.pdf) and the animation have been created with the http://stud.io lego digital design software. Part numbers (3001, 4201, etc) are as on https://www.bricklink.com/. Colors are black for the 2x4 and 8x8 bricks, "trans-clear" for the panels (i.e. glass windows), and white for the other three types of bricks. 
 
+**List of the parts:**
+
 <p align="center">
   <img src="lego-quantego-v04b-parts.png" alt="Quantego" width="450"/>
 </p>
 
+**Animation:**
 
-https://user-images.githubusercontent.com/26198628/163935836-3b2635b5-29a7-4a71-ad34-136ec45007ce.mp4
+https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4
+
 
 
 ## Modifications
