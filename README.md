@@ -42,7 +42,7 @@ In case you modify the model - or build your own quantum computer model - please
 
 ## Kits
 
-We are in working with a supplier who will provide complete kits with the above parts. These are planned to become available in late May 2022. URL will be posted here.
+A small internet shop offered to provide complete kits of the original Quantego model. These are planned to become available in late May 2022. URL will be posted here.
 
 ## RasQberry
 
