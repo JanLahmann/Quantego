@@ -28,9 +28,11 @@ The [instructions](lego-quantego-v04b.pdf) and the animation have been created w
 
 **Animation:**
 
-https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4
+<!--  https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4. -->
 
-
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4" alt="Quantego" width="450"/>
+</p>
 
 ## Modifications
 
