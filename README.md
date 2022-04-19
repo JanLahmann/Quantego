@@ -31,7 +31,7 @@ The [instructions](lego-quantego-v04b.pdf) and the animation have been created w
 <!--  https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4. -->
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26198628/163936447-9ea55bd3-e04c-420e-8d19-d3b08cf9d6d4.mp4" alt="Quantego" width="450"/>
+  <img src="https://user-images.githubusercontent.com/26198628/163948554-896524f4-b164-47a2-beb0-aa2d3fd50439.gif" alt="Quantego build animation" width="450"/>
 </p>
 
 ## Modifications
