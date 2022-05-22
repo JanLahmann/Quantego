@@ -18,7 +18,7 @@ This GitHub repo features a slightly simplified version made of 20 bricks:
 
 ## Instructions
 
-The [instructions](lego-quantego-v04b.pdf) and the animation have been created with the http://stud.io lego digital design software. Part numbers (3001, 4201, etc) are as on https://www.bricklink.com/. Colors are black for the 2x4 and 8x8 bricks, "trans-clear" for the panels (i.e. glass windows), and white for the other three types of bricks. 
+The [instructions](lego-quantego-v04b.pdf) and the animation have been created with the [stud.io](http://stud.io) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). Colors are black for the 2x4 and 8x8 bricks, "trans-clear" for the panels (i.e. glass windows), and white for the other three types of bricks. 
 
 **List of the parts:**
 
@@ -42,11 +42,11 @@ In case you modify the model - or build your own quantum computer model - please
 
 ## Kits
 
-A small internet shop offered to provide complete kits of the original Quantego model, consisting of 49 bricks. It is now available on etsy: https://www.etsy.com/listing/1230799391/lego-model-of-a-quantum-computer.
+A small internet shop offered to provide complete kits of the original Quantego model, consisting of 49 bricks. It is now available on [etsy](https://www.etsy.com/listing/1230799391/lego-model-of-a-quantum-computer).
 
 ## RasQberry
 
-In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantummm computing software framework), have a look at http://rasqberry.org.
+In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantummm computing software framework), have a look at [rasqberry.org](http://rasqberry.org).
 
 ---
 This GitHub project is not affiliated in any way with Lego nor bricklink. 
