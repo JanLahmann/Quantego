@@ -42,7 +42,7 @@ In case you modify the model - or build your own quantum computer model - please
 
 ## Kits
 
-A small internet shop offered to provide complete kits of the original Quantego model. These are planned to become available in late May 2022. URL will be posted here.
+A small internet shop offered to provide complete kits of the original Quantego model, consisting of 49 bricks. It is now available on etsy: https://www.etsy.com/listing/1230799391/lego-model-of-a-quantum-computer.
 
 ## RasQberry
 
