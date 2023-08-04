@@ -42,7 +42,7 @@ In case you modify the model - or build your own quantum computer model - please
 
 ## Kits
 
-A small internet shop offered to provide complete kits of the original Quantego model, consisting of 49 bricks. It is now available on [etsy](https://www.etsy.com/listing/1230799391/lego-model-of-a-quantum-computer).
+A small internet shop offered to provide complete kits of the original Quantego model, consisting of 49 bricks. It is now available at [Quantego.biz](https://Quantego.biz). Build instructions for these kits can be found here: [Quantego.biz build instructions](https://quantego.org/Quantego_instructions.pdf)
 
 ## RasQberry
 
