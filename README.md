@@ -31,14 +31,18 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
   <img src="LEGO-Quantego-v04b_3.png" alt="Quantego" width="250"/>
 </p>
 
-### List of the parts:
+### Build instructions 
+Build instructions can be found [here](https://quantego.org/Quantego_instructions.pdf)
+
+### Parts List
 
 <p align="center">
   <img src="lego-quantego-v04b-parts.png" alt="Quantego" width="450"/>
 </p>
 
-### Build instructions 
-Build instructions can be found [here](https://quantego.org/Quantego_instructions.pdf)
+### Digital design
+
+The digital design file is available [here](). This .io file can be imported into bricklink studio and used to order the bricks at any of the bricklink shops.
 
 
 ## IBM Quantum System Two
@@ -47,7 +51,7 @@ coming very soon
 
 ## Kits
 
-A small internet shop offered to provide complete kits of these models. They are available at [Quantego.biz](https://Quantego.biz). 
+A small internet shop provides complete kits of these models at [Quantego.biz](https://Quantego.biz). 
 
 ## RasQberry
 
