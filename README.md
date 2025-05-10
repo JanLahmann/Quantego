@@ -14,6 +14,8 @@ A Lego mode of IBM Quantum System *One* made of XX bricks and a model of IBM Qua
 For each of the models, build instructions and a parts list is being made available. 
 The instructions and the digital pictures and animations have been created with the [stud.io](http://stud.io) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
 
+We expect to make a much more sophisticated model of IBM Quantum System Two - made of 1024 bricks - available very soon. Stay tuned.
+
 
 ## IBM Quantum System One
 
@@ -41,7 +43,7 @@ Build instructions can be found [here](https://quantego.org/Quantego_instruction
 
 ## IBM Quantum System Two
 
-
+coming very soon
 
 ## Kits
 
