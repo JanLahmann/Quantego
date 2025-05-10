@@ -11,12 +11,6 @@ The first version of Quantego has been created by Mathilda Lahmann, as mentioned
 Currrently, we feature two differnt versions:
 A Lego mode of IBM Quantum System *One* made of XX bricks and a model of IBM Quantum System *Two* made of YY bricks. 
 
-<p align="center">
-  <img src="LEGO-Quantego-v04b.png" alt="Quantego" width="250"/>
-  <img src="LEGO-Quantego-v04b_2.png" alt="Quantego" width="250"/>
-  <img src="LEGO-Quantego-v04b_3.png" alt="Quantego" width="250"/>
-</p>
-
 For each of the models, build instructions and a parts list is being made available. 
 The instructions and the digital pictures and animations have been created with the [stud.io](http://stud.io) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
 
@@ -27,6 +21,12 @@ The instructions and the digital pictures and animations have been created with 
 
 <p align="center">
   <img src="https://user-images.githubusercontent.com/26198628/163948554-896524f4-b164-47a2-beb0-aa2d3fd50439.gif" alt="Quantego build animation" width="450"/>
+</p>
+
+<p align="center">
+  <img src="LEGO-Quantego-v04b.png" alt="Quantego" width="250"/>
+  <img src="LEGO-Quantego-v04b_2.png" alt="Quantego" width="250"/>
+  <img src="LEGO-Quantego-v04b_3.png" alt="Quantego" width="250"/>
 </p>
 
 ### List of the parts:
