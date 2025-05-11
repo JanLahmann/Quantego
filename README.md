@@ -72,9 +72,9 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 </p>
 
 <p align="center">
-  <img src="Qunatego-Two-1024/Qunatego-Two-1024_1.jpg" alt="Quantego" width="250"/>
-  <img src="Qunatego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" width="250"/>
-  <img src="Qunatego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" width="250"/>
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_1.jpg" alt="Quantego" height="50"/>
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" height="150"/>
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" height="50"/>
 </p>
 
 More infos and instructions coming soon
