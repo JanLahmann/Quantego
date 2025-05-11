@@ -67,6 +67,8 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 ## High-end model of IBM Quantum System Two
 
+[Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks. More infos and instructions coming soon.
+
 <p align="center">
   <img src="Qunatego-Two-1024/Qunatego-Two-1024.png" alt="Quantego" width="450"/>
 </p>
@@ -75,8 +77,6 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
   <img src="Qunatego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" width="250"/>
   <img src="Qunatego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" width="250"/>
 </p>
-
-More infos and instructions coming soon
 
 
 ## Kits
