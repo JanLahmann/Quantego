@@ -67,7 +67,17 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 ## High-end model of IBM Quantum System Two
 
-coming very soon
+<p align="center">
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024.png" alt="Quantego" width="450"/>
+</p>
+
+<p align="center">
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_1.jpg" alt="Quantego" width="250"/>
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" width="250"/>
+  <img src="Qunatego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" width="250"/>
+</p>
+
+More infos and instructions coming soon
 
 
 ## Kits
