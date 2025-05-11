@@ -19,7 +19,6 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
 
 ## IBM Quantum System One
 
-
 <p align="center">
   <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
 </p>
@@ -31,12 +30,12 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
 </p>
 
 ### Build instructions 
-Build instructions can be found [here](https://quantego.org/Quantego_instructions.pdf)
+Build instructions can be found [here](Quantego-One/Quantego-One-v05-instructions.pdf)
 
 ### Parts List
 
 <p align="center">
-  <img src="Quantego-One/lego-quantego-v04b-parts.png" alt="Quantego" width="450"/>
+  <img src="Quantego-One/Quantego-One-v05-parts.png" alt="Quantego" width="450"/>
 </p>
 
 ### Digital design
@@ -44,17 +43,37 @@ Build instructions can be found [here](https://quantego.org/Quantego_instruction
 The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into bricklink [studio](http://stud.io) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
 
 
+
 ## IBM Quantum System Two
 
-coming very soon
+<p align="center">
+  <img src="Quantego-Two/Quantego-Two.png" alt="Quantego build animation" width="450"/>
+</p>
+
+### Build instructions 
+Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pdf)
+
+### Parts List
+
+<p align="center">
+  <img src="Quantego-Two/Quantego-Two-parts.png" alt="Quantego" width="450"/>
+</p>
+
+### Digital design
+
+The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into bricklink [studio](http://stud.io) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
+
+
 
 ## High-end model of IBM Quantum System Two
 
 coming very soon
 
+
 ## Kits
 
 A small internet shop provides complete kits of these models at [Quantego.biz](https://Quantego.biz). 
+
 
 ## RasQberry
 
