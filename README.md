@@ -21,13 +21,8 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
 
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/26198628/163948554-896524f4-b164-47a2-beb0-aa2d3fd50439.gif" alt="Quantego build animation" width="450"/>
-</p>
-
-<p align="center">
   <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
 </p>
-Quantego-One/Quantego-One-v05-animation.gif
 
 <p align="center">
   <img src="Quantego-One/Quantego-One-v05.png" alt="Quantego" width="250"/>
