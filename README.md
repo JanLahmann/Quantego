@@ -12,7 +12,7 @@ Currrently, we feature two differnt versions:
 A Lego mode of IBM Quantum System *One* made of 49 bricks and a model of IBM Quantum System *Two* made of 105 bricks. 
 
 For each of the models, build instructions and a parts list is being made available. 
-The instructions and the digital pictures and animations have been created with the [stud.io](http://stud.io) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
+The instructions and the digital pictures and animations have been created with [bricklink studio](https://www.bricklink.com/v3/studio/main.page) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
 
 We expect to make a much more sophisticated model of IBM Quantum System Two - made of 1024 bricks - available very soon. Stay tuned.
 
@@ -40,7 +40,7 @@ Build instructions can be found [here](Quantego-One/Quantego-One-v05-instruction
 
 ### Digital design
 
-The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into bricklink [studio](http://stud.io) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
+The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into [bricklink studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
 
 
 
@@ -61,7 +61,7 @@ Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pd
 
 ### Digital design
 
-The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into bricklink [studio](http://stud.io) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
+The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into [bricklink studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
 
 
 
@@ -72,7 +72,7 @@ coming very soon
 
 ## Kits
 
-A small internet shop provides complete kits of these models at [Quantego.biz](https://Quantego.biz). 
+A small internet shop provides complete kits of these models at [Quantego.biz](http://Quantego.biz). 
 
 
 ## RasQberry
