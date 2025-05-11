@@ -1,8 +1,8 @@
 # Quantego
 
-## Quantego is a family of Lego models of the IBM Quantum System One quantum computer
+## Quantego is a family of Lego models of IBM Quantum Computers
 
-The first version of Quantego has been created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and again in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
+The first version of Quantego has been created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
   <img src="1_20220414_121449.jpg" alt="Quantego" width="300"/>
@@ -42,10 +42,14 @@ Build instructions can be found [here](https://quantego.org/Quantego_instruction
 
 ### Digital design
 
-The digital design file is available [here](). This .io file can be imported into bricklink studio and used to order the bricks at any of the bricklink shops.
+The digital design file is available [here](). This .io file can be imported into bricklink [studio](http://stud.io) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops.
 
 
 ## IBM Quantum System Two
+
+coming very soon
+
+## High-end model of IBM Quantum System Two
 
 coming very soon
 
