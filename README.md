@@ -67,16 +67,25 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 ## High-end model of IBM Quantum System Two
 
-[Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks. More infos and instructions coming soon.
+[Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks.
 
 <p align="center">
-  <img src="Qunatego-Two-1024/Qunatego-Two-1024.png" alt="Quantego" width="450"/>
+  <img src="Qunatego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
 </p>
 
 <p align="center">
   <img src="Qunatego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" width="250"/>
   <img src="Qunatego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" width="250"/>
 </p>
+
+### Build instructions 
+Build instructions can be found [here](Qunatego-Two-1024/Quantego-Two-1024_v3_instructions.pdf)
+
+### Parts List
+Parts list can be found at the end of the build instructions file. You can also download [this json](Qunatego-Two-1024/Quantego-Two-1024_v3_PAB.json) and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
+
+### Disclaimer
+This 1024 parts model has been designed by Lego amateurs (not professional): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
 
 
 ## Kits
