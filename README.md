@@ -70,7 +70,7 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 [Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks.
 
 <p align="center">
-  <img src="Qunatego-Two-1024/Renders/Quantego-Two-1024_6.png" alt="Quantego" width="450"/>
+  <img src="Qunatego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
 </p>
 
 <p align="center">
