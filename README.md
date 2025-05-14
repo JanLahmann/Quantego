@@ -75,14 +75,14 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 You can find on the folder [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) other renders of the 1024 bricks model!
 
-Here there are some actual photos of the built model!
+Here there are some actual photos of the built model, all the others will be posted in the [Photos](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Photos) folder.
 <p align="center">
-  <img src="Quantego-Two-1024/Qunatego-Two-1024_2.jpg" alt="Quantego" width="250"/>
-  <img src="Quantego-Two-1024/Qunatego-Two-1024_3.jpg" alt="Quantego" width="250"/>
+  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo1.jpg" alt="Quantego" width="250"/>
+  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo2.jpg" alt="Quantego" width="250"/>
 </p>
 
 ### Build instructions 
-Build instructions can be found [here](Quantego-Two-1024/Quantego-Two-1024_v3_instructions.pdf)
+Build instructions can be found [here](Quantego-Two-1024/Quantego-Two-1024_v3_instructions.pdf).
 
 ### Parts List
 Parts list can be found at the end of the build instructions file. You can also download [this json](Quantego-Two-1024/Quantego-Two-1024_v3_PAB.json) and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
