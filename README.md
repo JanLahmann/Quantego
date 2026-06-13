@@ -2,6 +2,14 @@
 
 ## Quantego is a family of Lego models of IBM Quantum Computers
 
+<link rel="stylesheet" href="/assets/css/viewer.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+
 The first version of Quantego has been created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
@@ -18,6 +26,8 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
 
 
 ## IBM Quantum System One
+
+<div class="viewer" data-model="/assets/models/quantego-one.mpd"></div>
 
 <p align="center">
   <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
@@ -46,6 +56,8 @@ The digital design file is available [here](Quantego-One/Quantego-One-v05.io). T
 
 ## IBM Quantum System Two
 
+<div class="viewer" data-model="/assets/models/quantego-two.mpd"></div>
+
 <p align="center">
   <img src="Quantego-Two/Quantego-Two.png" alt="Quantego build animation" width="450"/>
 </p>
@@ -68,6 +80,8 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 ## High-end model of IBM Quantum System Two
 
 [Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks.
+
+<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd"></div>
 
 <p align="center">
   <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
@@ -103,4 +117,6 @@ In case you would like to build a **functional model** of the IBM Quantum System
 ---
 This GitHub project is not affiliated in any way with Lego nor bricklink. 
 LEGO and BrickLink are trademarks of the LEGO Group.
+
+<script type="module" src="/assets/js/ldraw-viewer.js"></script>
 
