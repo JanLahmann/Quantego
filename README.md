@@ -129,5 +129,9 @@ In case you would like to build a **functional model** of the IBM Quantum System
 This GitHub project is not affiliated in any way with Lego, bricklink, nor IBM. 
 LEGO and BrickLink are trademarks of the LEGO Group. IBM and IBM Quantum are trademarks of International Business Machines Corporation.
 
+### Acknowledgments
+
+The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDrawLoader` and `OrbitControls`) and use the [LDraw™ Parts Library](https://www.ldraw.org) (parts geometry is licensed [CC BY](https://www.ldraw.org/article/745.html)). Augmented-reality viewing is powered by [&lt;model-viewer&gt;](https://modelviewer.dev). The models were designed in [BrickLink Studio](https://www.bricklink.com/v3/studio/download.page).
+
 <script type="module" src="/assets/js/ldraw-viewer.js"></script>
 
