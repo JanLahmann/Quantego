@@ -550,7 +550,7 @@ function createCompareViewer( container, urls ) {
     controls.target.copy( c );
     controls.update();
 
-    buildDrop = s.y * 1.5; // bricks fall in from above the tallest model
+    buildDrop = s.y * 3.5; // bricks fall in from above the frame (offscreen)
     addCompareControls();
     maybeAutoPlay();
   }
@@ -590,7 +590,7 @@ function createCompareViewer( container, urls ) {
     const seq = collectBricks();
     if ( seq.length <= 1 ) return null;
     const stagger = THREE.MathUtils.clamp( 8000 / seq.length, 6, 60 );
-    const fallDur = 800;
+    const fallDur = 1000; // a touch longer so the higher drop stays graceful
     const dropHeight = reduceMotion ? 0 : buildDrop;
 
     // Per-brick start time. Bricks within a model cascade `stagger` apart, but a
