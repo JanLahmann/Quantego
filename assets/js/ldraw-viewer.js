@@ -167,7 +167,7 @@ function createViewer( container, modelUrl ) {
     const btn = document.createElement( 'button' );
     btn.type = 'button';
     btn.className = 'rebuild-btn';
-    btn.textContent = '↻ Replay build';
+    btn.textContent = '▶ Start animation';
     btn.addEventListener( 'click', playBuild );
     container.appendChild( btn );
   }
