@@ -16,8 +16,8 @@ The first version of Quantego has been created by Mathilda Lahmann, as mentioned
   <img src="First-Quantego.jpg" alt="Quantego" width="300"/>
 </p>
 
-Currrently, we feature two differnt versions:
-A Lego mode of IBM Quantum System *One* made of 49 bricks and a model of IBM Quantum System *Two* made of 105 bricks. 
+Currently, we feature two different versions:
+A Lego model of IBM Quantum System *One* made of 49 bricks and a model of IBM Quantum System *Two* made of 105 bricks. 
 
 For each of the models, build instructions and a parts list is being made available. 
 The instructions and the digital pictures and animations have been created with [bricklink studio](https://www.bricklink.com/v3/studio/main.page) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
@@ -31,7 +31,7 @@ We expect to make a much more sophisticated model of IBM Quantum System Two - ma
   <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-one.mpd"></div>
+<div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
 
 <p align="center">
   <img src="Quantego-One/Quantego-One-v05.png" alt="Quantego" width="250"/>
@@ -60,7 +60,7 @@ The digital design file is available [here](Quantego-One/Quantego-One-v05.io). T
   <img src="Quantego-Two/Quantego-Two.png" alt="Quantego build animation" width="450"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-two.mpd"></div>
+<div class="viewer" data-model="/assets/models/quantego-two.mpd" data-ar="/assets/models/quantego-two.glb" data-ar-ios="/assets/models/quantego-two.usdz"></div>
 
 ### Build instructions 
 Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pdf)
@@ -85,7 +85,7 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
   <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd"></div>
+<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false"></div>
 
 You can find on the folder [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) other renders of the 1024 bricks model!
 
@@ -109,6 +109,13 @@ The digital design file is available [here](Quantego-Two-1024/Quantego-Two-1024_
 This 1024 parts model has been designed by Lego amateurs (not professional): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
 
 
+## Compare the models
+
+All three models shown side by side at the same physical scale. Drag to rotate, scroll or pinch to zoom.
+
+<div class="viewer-compare" data-models="/assets/models/quantego-one.mpd,/assets/models/quantego-two.mpd,/assets/models/quantego-two-1024.mpd"></div>
+
+
 ## Kits
 
 A small internet shop provides complete kits of these models at [Quantego.biz](http://Quantego.biz). 
@@ -116,7 +123,7 @@ A small internet shop provides complete kits of these models at [Quantego.biz](h
 
 ## RasQberry
 
-In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantummm computing software framework), have a look at [rasqberry.org](http://rasqberry.org).
+In case you would like to build a **functional model** of the IBM Quantum System One quantum computer, based on 3D printing, a [Raspberry Pi](https://www.raspberrypi.org) mini computer and [Qiskit](http://qiskit.org) (IBM's open source quantum computing software framework), have a look at [rasqberry.org](http://rasqberry.org).
 
 ---
 This GitHub project is not affiliated in any way with Lego, bricklink, nor IBM. 
