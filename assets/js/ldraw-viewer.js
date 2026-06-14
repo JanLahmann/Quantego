@@ -10,6 +10,23 @@ function ensureModelViewer() {
     ( modelViewerPromise = import( 'https://cdn.jsdelivr.net/npm/@google/model-viewer@3.5.0/dist/model-viewer.min.js' ) );
 }
 
+function viewerButton( label, onClick ) {
+  const btn = document.createElement( 'button' );
+  btn.type = 'button';
+  btn.className = 'viewer-btn';
+  btn.textContent = label;
+  btn.addEventListener( 'click', onClick );
+  return btn;
+}
+
+// Building step of an object = step of its nearest ancestor that carries one.
+function buildingStepOf( obj ) {
+  for ( let n = obj; n; n = n.parent ) {
+    if ( n.userData && n.userData.buildingStep !== undefined ) return n.userData.buildingStep;
+  }
+  return 0;
+}
+
 function createViewer( container, modelUrl ) {
 
   const renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -48,6 +65,8 @@ function createViewer( container, modelUrl ) {
   let explodeTarget = 0; // where it's easing toward
   let exploded = false;
   let explodeBtn = null;
+  let scrubber = null; // range input that tracks / seeks build progress
+  let playBtn = null; // play / pause toggle for the build animation
   let visible = false; // in-viewport flag; set by the IntersectionObserver
   let running = false;
 
@@ -167,46 +186,113 @@ function createViewer( container, modelUrl ) {
     );
   }
 
-  // Plays the build animation once, then returns to the finished + auto-spin state.
-  // Safe to call repeatedly (e.g. from the Replay button); restarts if already running.
-  function playBuild() {
-    if ( ! model ) return;
-    finishBuild(); // reset any in-flight build / explode before restarting
+  // Builds the animation timeline (brick order + timing) without starting the
+  // clock. Lazily created so the scrubber can seek into a build even before the
+  // user presses play. Returns null for models too small to animate.
+  function ensureBuildTimeline() {
+    if ( buildAnim ) return buildAnim;
     const bricks = bricksInBuildOrder();
-    if ( bricks.length <= 1 ) return;
-
-    container.classList.add( 'is-building' );
-    controls.autoRotate = false;
-    bricks.forEach( g => ( g.visible = false ) );
-
+    if ( bricks.length <= 1 ) return null;
     // ms between bricks; the floor stretches very large models (the 1024) so
     // its build runs ~50% longer instead of bottoming out too fast.
     const stagger = THREE.MathUtils.clamp( 4200 / bricks.length, 12, 110 );
     const fallDur = 800; // ms per brick to drop into place
     // Reduced-motion users get an instant in-order reveal with no drop.
     const dropHeight = ( BUILD_STYLE === 'fall' && ! reduceMotion ) ? modelMaxDim * 2.0 : 0;
-    buildAnim = { bricks, startTime: performance.now(), stagger, fallDur, dropHeight };
+    const totalDur = ( bricks.length - 1 ) * stagger + fallDur;
+    buildAnim = { bricks, stagger, fallDur, dropHeight, totalDur, startTime: performance.now(), scrubbing: false, paused: false, progress: 0 };
+    container.classList.add( 'is-building' );
+    controls.autoRotate = false;
+    return buildAnim;
   }
 
-  // Advances the falling-bricks animation; called once per rendered frame.
-  function stepBuildAnim() {
-    if ( ! buildAnim ) return;
-    const { bricks, startTime, stagger, fallDur, dropHeight } = buildAnim;
-    const elapsed = performance.now() - startTime;
-    let allDone = true;
+  // Plays the build animation once, then returns to the finished + auto-spin state.
+  // Safe to call repeatedly (e.g. from the Start button); restarts from the top.
+  function playBuild() {
+    if ( ! model ) return;
+    finishBuild(); // reset any in-flight build / explode before restarting
+    const a = ensureBuildTimeline();
+    if ( ! a ) return;
+    a.startTime = performance.now();
+    a.scrubbing = false;
+    a.paused = false;
+    a.progress = 0;
+    updatePlayBtn();
+  }
+
+  // Play/pause toggle: starts a build if none is running, otherwise pauses or
+  // resumes the current one.
+  function togglePlay() {
+    if ( ! model ) return;
+    if ( ! buildAnim ) { playBuild(); return; }
+    if ( buildAnim.paused ) {
+      buildAnim.paused = false;
+      buildAnim.startTime = performance.now() - buildAnim.progress * buildAnim.totalDur;
+    } else {
+      buildAnim.paused = true;
+    }
+    updatePlayBtn();
+  }
+
+  function updatePlayBtn() {
+    if ( ! playBtn ) return;
+    const playing = buildAnim && ! buildAnim.paused && ! buildAnim.scrubbing;
+    playBtn.textContent = playing ? '⏸' : '▶';
+    playBtn.setAttribute( 'aria-label', playing ? 'Pause' : 'Play build animation' );
+  }
+
+  // Positions/reveals every brick for a given point on the timeline (ms).
+  function applyBuildAt( elapsed ) {
+    const { bricks, stagger, fallDur, dropHeight } = buildAnim;
     for ( let i = 0; i < bricks.length; i ++ ) {
       const e = elapsed - i * stagger;
       const g = bricks[ i ];
-      if ( e < 0 ) { g.visible = false; allDone = false; continue; }
+      if ( e < 0 ) { g.visible = false; continue; }
       g.visible = true;
       if ( dropHeight > 0 ) {
         const t = Math.min( 1, e / fallDur );
-        if ( t < 1 ) allDone = false;
         const h = dropHeight * ( 1 - t * t ); // ease-in: accelerate like gravity
         g.position.copy( g.userData.restPos ).addScaledVector( g.userData.upLocal, h );
       }
     }
-    if ( allDone ) finishBuild();
+  }
+
+  // Advances (or holds, while paused/scrubbing) the build animation; per frame.
+  function stepBuildAnim() {
+    if ( ! buildAnim ) return;
+    const a = buildAnim;
+    const held = a.scrubbing || a.paused;
+    let elapsed;
+    if ( held ) {
+      elapsed = a.progress * a.totalDur;
+    } else {
+      elapsed = performance.now() - a.startTime;
+      a.progress = Math.min( 1, elapsed / a.totalDur );
+    }
+    applyBuildAt( Math.min( elapsed, a.totalDur ) );
+    if ( scrubber && ! a.scrubbing ) scrubber.value = Math.min( 1, elapsed / a.totalDur ) * 1000;
+    if ( ! held && elapsed >= a.totalDur ) finishBuild();
+  }
+
+  // User grabbed the scrubber: hold the build at the dragged position.
+  function onScrubInput() {
+    const a = ensureBuildTimeline();
+    if ( ! a ) return;
+    a.scrubbing = true;
+    a.progress = scrubber.value / 1000;
+    updatePlayBtn();
+  }
+
+  // User released the scrubber: resume from here, preserving the paused state.
+  function onScrubRelease() {
+    const a = buildAnim;
+    if ( ! a ) return;
+    const p = scrubber.value / 1000;
+    a.progress = p;
+    a.scrubbing = false;
+    if ( p >= 1 && ! a.paused ) { finishBuild(); return; }
+    if ( ! a.paused ) a.startTime = performance.now() - p * a.totalDur;
+    updatePlayBtn();
   }
 
   function finishBuild() {
@@ -214,6 +300,8 @@ function createViewer( container, modelUrl ) {
     explodeTarget = explodeFactor = 0;
     exploded = false;
     if ( explodeBtn ) explodeBtn.textContent = '⤢ Explode';
+    if ( scrubber ) scrubber.value = 0;
+    updatePlayBtn();
     if ( model ) model.traverse( c => {
       if ( c.isMesh || c.isLineSegments || c.isLine ) c.visible = true;
       else if ( c.isGroup ) {
@@ -272,12 +360,29 @@ function createViewer( container, modelUrl ) {
   function addControls() {
     const bar = document.createElement( 'div' );
     bar.className = 'viewer-controls';
-    bar.appendChild( makeBtn( '▶ Start animation', playBuild ) );
     explodeBtn = makeBtn( '⤢ Explode', toggleExplode );
     bar.appendChild( explodeBtn );
     if ( container.dataset.ar ) bar.appendChild( makeBtn( '📱 View in AR', openAR ) );
     if ( container.requestFullscreen ) bar.appendChild( makeBtn( '⛶ Fullscreen', toggleFullscreen ) );
     container.appendChild( bar );
+
+    // Transport bar: play/pause toggle + drag-to-seek progress bar.
+    const transport = document.createElement( 'div' );
+    transport.className = 'viewer-transport';
+    playBtn = makeBtn( '▶', togglePlay );
+    playBtn.classList.add( 'viewer-play' );
+    playBtn.setAttribute( 'aria-label', 'Play build animation' );
+    scrubber = document.createElement( 'input' );
+    scrubber.type = 'range';
+    scrubber.min = 0;
+    scrubber.max = 1000;
+    scrubber.value = 0;
+    scrubber.className = 'viewer-scrub';
+    scrubber.setAttribute( 'aria-label', 'Build animation progress' );
+    scrubber.addEventListener( 'input', onScrubInput );
+    scrubber.addEventListener( 'change', onScrubRelease );
+    transport.append( playBtn, scrubber );
+    container.appendChild( transport );
   }
 
   // Opens a lightweight overlay with <model-viewer>; on a phone its AR button
@@ -375,6 +480,11 @@ function createCompareViewer( container, urls ) {
   scene.add( holder );
   const loaded = new Array( urls.length ).fill( null );
   let running = false;
+  let bricks = null; // flat build sequence: model 0's bricks, then model 1's, …
+  let buildAnim = null;
+  let buildDrop = 100; // how high bricks fall from, set once laid out
+  let scrubber = null;
+  let playBtn = null;
 
   container.classList.add( 'is-loading' );
   urls.forEach( ( url, i ) => {
@@ -396,9 +506,11 @@ function createCompareViewer( container, urls ) {
       box.setFromObject( g );
       const size = box.getSize( new THREE.Vector3() );
       gap = Math.max( gap, size.x * 0.18 );
-      // Sit on the ground (min.y -> 0) and butt the left edge against the cursor.
+      // Sit on the ground (min.y -> 0), butt the left edge against the cursor,
+      // and line up the front edges (max.z, the face nearest the camera) at z=0.
       g.position.y += - box.min.y;
       g.position.x += cursor - box.min.x;
+      g.position.z += - box.max.z;
       holder.add( g );
       cursor += size.x + gap;
     } );
@@ -419,11 +531,184 @@ function createCompareViewer( container, urls ) {
     camera.updateProjectionMatrix();
     controls.target.copy( c );
     controls.update();
+
+    buildDrop = s.y * 1.5; // bricks fall in from above the tallest model
+    addCompareControls();
+  }
+
+  // Each brick is the group directly holding a mesh + outline edges. Gather them
+  // across all models into one sequence — model 0 first, then 1, then 2 — each in
+  // its own build-step order, so the row assembles one model after another.
+  function collectBricks() {
+    if ( bricks ) return bricks;
+    const worldUp = new THREE.Vector3( 0, 1, 0 );
+    const seq = [];
+    holder.updateWorldMatrix( true, true );
+    loaded.forEach( g => {
+      const seen = new Set();
+      const arr = [];
+      g.traverse( c => {
+        if ( ! ( c.isMesh || c.isLineSegments || c.isLine ) ) return;
+        const grp = c.parent;
+        if ( ! grp || seen.has( grp ) ) return;
+        seen.add( grp );
+        const invParent = grp.parent.getWorldQuaternion( new THREE.Quaternion() ).invert();
+        grp.userData.restPos = grp.position.clone();
+        grp.userData.upLocal = worldUp.clone().applyQuaternion( invParent ).normalize();
+        grp.userData.step = buildingStepOf( grp );
+        arr.push( grp );
+      } );
+      arr.sort( ( a, b ) => a.userData.step - b.userData.step ); // stable within a model
+      arr.forEach( grp => seq.push( grp ) );
+    } );
+    bricks = seq;
+    return seq;
+  }
+
+  function ensureCompareTimeline() {
+    if ( buildAnim ) return buildAnim;
+    const seq = collectBricks();
+    if ( seq.length <= 1 ) return null;
+    const stagger = THREE.MathUtils.clamp( 8000 / seq.length, 6, 60 );
+    const fallDur = 800;
+    const dropHeight = reduceMotion ? 0 : buildDrop;
+    const totalDur = ( seq.length - 1 ) * stagger + fallDur;
+    buildAnim = { bricks: seq, stagger, fallDur, dropHeight, totalDur, startTime: performance.now(), scrubbing: false, paused: false, progress: 0 };
+    controls.autoRotate = false;
+    return buildAnim;
+  }
+
+  function playBuild() {
+    finishBuild();
+    const a = ensureCompareTimeline();
+    if ( ! a ) return;
+    a.startTime = performance.now();
+    a.scrubbing = false;
+    a.paused = false;
+    a.progress = 0;
+    updatePlayBtn();
+  }
+
+  function applyBuildAt( elapsed ) {
+    const { bricks: seq, stagger, fallDur, dropHeight } = buildAnim;
+    for ( let i = 0; i < seq.length; i ++ ) {
+      const e = elapsed - i * stagger;
+      const g = seq[ i ];
+      if ( e < 0 ) { g.visible = false; continue; }
+      g.visible = true;
+      if ( dropHeight > 0 ) {
+        const t = Math.min( 1, e / fallDur );
+        const h = dropHeight * ( 1 - t * t );
+        g.position.copy( g.userData.restPos ).addScaledVector( g.userData.upLocal, h );
+      }
+    }
+  }
+
+  function stepBuild() {
+    if ( ! buildAnim ) return;
+    const a = buildAnim;
+    const held = a.scrubbing || a.paused;
+    let elapsed;
+    if ( held ) {
+      elapsed = a.progress * a.totalDur;
+    } else {
+      elapsed = performance.now() - a.startTime;
+      a.progress = Math.min( 1, elapsed / a.totalDur );
+    }
+    applyBuildAt( Math.min( elapsed, a.totalDur ) );
+    if ( scrubber && ! a.scrubbing ) scrubber.value = Math.min( 1, elapsed / a.totalDur ) * 1000;
+    if ( ! held && elapsed >= a.totalDur ) finishBuild();
+  }
+
+  function finishBuild() {
+    buildAnim = null;
+    if ( scrubber ) scrubber.value = 0;
+    loaded.forEach( g => g.traverse( c => {
+      if ( c.isMesh || c.isLineSegments || c.isLine ) c.visible = true;
+      else if ( c.isGroup ) {
+        c.visible = true;
+        if ( c.userData.restPos ) c.position.copy( c.userData.restPos );
+      }
+    } ) );
+    controls.autoRotate = ! reduceMotion;
+    updatePlayBtn();
+  }
+
+  function togglePlay() {
+    if ( ! loaded.every( Boolean ) ) return;
+    if ( ! buildAnim ) { playBuild(); return; }
+    if ( buildAnim.paused ) {
+      buildAnim.paused = false;
+      buildAnim.startTime = performance.now() - buildAnim.progress * buildAnim.totalDur;
+    } else {
+      buildAnim.paused = true;
+    }
+    updatePlayBtn();
+  }
+
+  function updatePlayBtn() {
+    if ( ! playBtn ) return;
+    const playing = buildAnim && ! buildAnim.paused && ! buildAnim.scrubbing;
+    playBtn.textContent = playing ? '⏸' : '▶';
+    playBtn.setAttribute( 'aria-label', playing ? 'Pause' : 'Play build animation' );
+  }
+
+  function onScrubInput() {
+    const a = ensureCompareTimeline();
+    if ( ! a ) return;
+    a.scrubbing = true;
+    a.progress = scrubber.value / 1000;
+    updatePlayBtn();
+  }
+
+  function onScrubRelease() {
+    const a = buildAnim;
+    if ( ! a ) return;
+    const p = scrubber.value / 1000;
+    a.progress = p;
+    a.scrubbing = false;
+    if ( p >= 1 && ! a.paused ) { finishBuild(); return; }
+    if ( ! a.paused ) a.startTime = performance.now() - p * a.totalDur;
+    updatePlayBtn();
+  }
+
+  function toggleFullscreen() {
+    if ( document.fullscreenElement === container ) document.exitFullscreen();
+    else if ( container.requestFullscreen ) container.requestFullscreen();
+  }
+
+  function addCompareControls() {
+    if ( playBtn ) return; // already added
+
+    if ( container.requestFullscreen ) {
+      const bar = document.createElement( 'div' );
+      bar.className = 'viewer-controls';
+      bar.appendChild( viewerButton( '⛶ Fullscreen', toggleFullscreen ) );
+      container.appendChild( bar );
+    }
+
+    const transport = document.createElement( 'div' );
+    transport.className = 'viewer-transport';
+    playBtn = viewerButton( '▶', togglePlay );
+    playBtn.classList.add( 'viewer-play' );
+    playBtn.setAttribute( 'aria-label', 'Play build animation' );
+    scrubber = document.createElement( 'input' );
+    scrubber.type = 'range';
+    scrubber.min = 0;
+    scrubber.max = 1000;
+    scrubber.value = 0;
+    scrubber.className = 'viewer-scrub';
+    scrubber.setAttribute( 'aria-label', 'Build animation progress' );
+    scrubber.addEventListener( 'input', onScrubInput );
+    scrubber.addEventListener( 'change', onScrubRelease );
+    transport.append( playBtn, scrubber );
+    container.appendChild( transport );
   }
 
   function renderLoop() {
     if ( ! running ) return;
     requestAnimationFrame( renderLoop );
+    stepBuild();
     controls.update();
     renderer.render( scene, camera );
   }

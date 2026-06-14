@@ -19,12 +19,42 @@
 .viewer-controls {
   position: absolute;
   right: 10px;
-  bottom: 10px;
+  bottom: 28px;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 6px;
 }
+
+/* Play/pause + drag-to-seek progress bar, pinned along the bottom edge. */
+.viewer-transport {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 9px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-play {
+  flex: 0 0 auto;
+  padding: .2rem .5rem;
+  line-height: 1;
+  font-size: .9rem;
+}
+
+.viewer-scrub {
+  flex: 1 1 auto;
+  height: 14px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #1b1f24;
+  opacity: .8;
+  transition: opacity .15s ease;
+}
+
+.viewer-scrub:hover { opacity: 1; }
 
 .viewer-btn {
   padding: .45rem .8rem;
@@ -42,7 +72,7 @@
 .viewer-btn:hover { background: #fff; }
 .viewer-btn:active { transform: translateY(1px); }
 
-.viewer:fullscreen {
+.viewer:fullscreen, .viewer-compare:fullscreen {
   width: 100vw;
   height: 100vh;
   max-width: none;
