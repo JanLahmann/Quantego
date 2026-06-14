@@ -85,7 +85,7 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
   <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false"></div>
+<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
 
 You can find on the folder [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) other renders of the 1024 bricks model!
 

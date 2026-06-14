@@ -67,7 +67,10 @@ function createViewer( container, modelUrl ) {
   let explodeBtn = null;
   let scrubber = null; // range input that tracks / seeks build progress
   let playBtn = null; // play / pause toggle for the build animation
+  let restartAt = null; // timestamp to auto-replay at (endless loop), or null
   let visible = false; // in-viewport flag; set by the IntersectionObserver
+
+  const LOOP_DELAY = 3000; // ms to hold the finished model before looping
   let running = false;
 
   const loader = new LDrawLoader();
@@ -217,6 +220,7 @@ function createViewer( container, modelUrl ) {
     a.scrubbing = false;
     a.paused = false;
     a.progress = 0;
+    restartAt = null;
     updatePlayBtn();
   }
 
@@ -271,7 +275,10 @@ function createViewer( container, modelUrl ) {
     }
     applyBuildAt( Math.min( elapsed, a.totalDur ) );
     if ( scrubber && ! a.scrubbing ) scrubber.value = Math.min( 1, elapsed / a.totalDur ) * 1000;
-    if ( ! held && elapsed >= a.totalDur ) finishBuild();
+    if ( ! held && elapsed >= a.totalDur ) {
+      finishBuild();
+      if ( ! reduceMotion ) restartAt = performance.now() + LOOP_DELAY; // endless loop
+    }
   }
 
   // User grabbed the scrubber: hold the build at the dragged position.
@@ -280,6 +287,7 @@ function createViewer( container, modelUrl ) {
     if ( ! a ) return;
     a.scrubbing = true;
     a.progress = scrubber.value / 1000;
+    restartAt = null; // user took control; stop the auto-loop
     updatePlayBtn();
   }
 
@@ -322,6 +330,7 @@ function createViewer( container, modelUrl ) {
 
   function toggleExplode() {
     if ( ! model ) return;
+    restartAt = null; // exploring pauses the auto-loop
     if ( buildAnim ) finishBuild(); // can't explode mid-build
     ensureBrickData();
     exploded = ! exploded;
@@ -418,6 +427,10 @@ function createViewer( container, modelUrl ) {
   function renderLoop() {
     if ( ! running ) return;
     requestAnimationFrame( renderLoop );
+    if ( restartAt !== null && ! buildAnim && visible && performance.now() >= restartAt ) {
+      restartAt = null;
+      playBuild();
+    }
     stepBuildAnim();
     stepExplode();
     controls.update();
@@ -485,6 +498,11 @@ function createCompareViewer( container, urls ) {
   let buildDrop = 100; // how high bricks fall from, set once laid out
   let scrubber = null;
   let playBtn = null;
+  let restartAt = null; // timestamp to auto-replay at (endless loop), or null
+  let hasAutoPlayed = false;
+
+  const LOOP_DELAY = 3000; // ms to hold the finished row before looping
+  const MODEL_GAP = 600; // ms pause after a model finishes before the next starts
 
   container.classList.add( 'is-loading' );
   urls.forEach( ( url, i ) => {
@@ -534,6 +552,7 @@ function createCompareViewer( container, urls ) {
 
     buildDrop = s.y * 1.5; // bricks fall in from above the tallest model
     addCompareControls();
+    maybeAutoPlay();
   }
 
   // Each brick is the group directly holding a mesh + outline edges. Gather them
@@ -544,7 +563,7 @@ function createCompareViewer( container, urls ) {
     const worldUp = new THREE.Vector3( 0, 1, 0 );
     const seq = [];
     holder.updateWorldMatrix( true, true );
-    loaded.forEach( g => {
+    loaded.forEach( ( g, mi ) => {
       const seen = new Set();
       const arr = [];
       g.traverse( c => {
@@ -556,6 +575,7 @@ function createCompareViewer( container, urls ) {
         grp.userData.restPos = grp.position.clone();
         grp.userData.upLocal = worldUp.clone().applyQuaternion( invParent ).normalize();
         grp.userData.step = buildingStepOf( grp );
+        grp.userData.modelIndex = mi;
         arr.push( grp );
       } );
       arr.sort( ( a, b ) => a.userData.step - b.userData.step ); // stable within a model
@@ -572,7 +592,21 @@ function createCompareViewer( container, urls ) {
     const stagger = THREE.MathUtils.clamp( 8000 / seq.length, 6, 60 );
     const fallDur = 800;
     const dropHeight = reduceMotion ? 0 : buildDrop;
-    const totalDur = ( seq.length - 1 ) * stagger + fallDur;
+
+    // Per-brick start time. Bricks within a model cascade `stagger` apart, but a
+    // new model only begins once the previous one has fully landed (+ a gap), so
+    // the models assemble strictly one after another.
+    let t = 0, prev = null;
+    for ( const g of seq ) {
+      if ( prev && g.userData.modelIndex !== prev.userData.modelIndex ) {
+        t = prev.userData.t0 + fallDur + MODEL_GAP;
+      }
+      g.userData.t0 = t;
+      prev = g;
+      t += stagger;
+    }
+    const totalDur = seq[ seq.length - 1 ].userData.t0 + fallDur;
+
     buildAnim = { bricks: seq, stagger, fallDur, dropHeight, totalDur, startTime: performance.now(), scrubbing: false, paused: false, progress: 0 };
     controls.autoRotate = false;
     return buildAnim;
@@ -586,14 +620,15 @@ function createCompareViewer( container, urls ) {
     a.scrubbing = false;
     a.paused = false;
     a.progress = 0;
+    restartAt = null;
     updatePlayBtn();
   }
 
   function applyBuildAt( elapsed ) {
-    const { bricks: seq, stagger, fallDur, dropHeight } = buildAnim;
+    const { bricks: seq, fallDur, dropHeight } = buildAnim;
     for ( let i = 0; i < seq.length; i ++ ) {
-      const e = elapsed - i * stagger;
       const g = seq[ i ];
+      const e = elapsed - g.userData.t0;
       if ( e < 0 ) { g.visible = false; continue; }
       g.visible = true;
       if ( dropHeight > 0 ) {
@@ -617,7 +652,16 @@ function createCompareViewer( container, urls ) {
     }
     applyBuildAt( Math.min( elapsed, a.totalDur ) );
     if ( scrubber && ! a.scrubbing ) scrubber.value = Math.min( 1, elapsed / a.totalDur ) * 1000;
-    if ( ! held && elapsed >= a.totalDur ) finishBuild();
+    if ( ! held && elapsed >= a.totalDur ) {
+      finishBuild();
+      if ( ! reduceMotion ) restartAt = performance.now() + LOOP_DELAY; // endless loop
+    }
+  }
+
+  function maybeAutoPlay() {
+    if ( hasAutoPlayed || reduceMotion || ! running || ! loaded.every( Boolean ) ) return;
+    hasAutoPlayed = true;
+    playBuild();
   }
 
   function finishBuild() {
@@ -658,6 +702,7 @@ function createCompareViewer( container, urls ) {
     if ( ! a ) return;
     a.scrubbing = true;
     a.progress = scrubber.value / 1000;
+    restartAt = null; // user took control; stop the auto-loop
     updatePlayBtn();
   }
 
@@ -708,6 +753,10 @@ function createCompareViewer( container, urls ) {
   function renderLoop() {
     if ( ! running ) return;
     requestAnimationFrame( renderLoop );
+    if ( restartAt !== null && ! buildAnim && performance.now() >= restartAt ) {
+      restartAt = null;
+      playBuild();
+    }
     stepBuild();
     controls.update();
     renderer.render( scene, camera );
@@ -715,7 +764,7 @@ function createCompareViewer( container, urls ) {
 
   new IntersectionObserver( entries => {
     running = entries[ 0 ].isIntersecting;
-    if ( running ) renderLoop();
+    if ( running ) { renderLoop(); maybeAutoPlay(); }
   }, { threshold: 0.02 } ).observe( container );
 
   new ResizeObserver( () => {

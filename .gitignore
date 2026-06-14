@@ -1,7 +1,2 @@
 .DS_Store
-
-# Local-only AR exports for the 1024-brick model (16 MB GLB / 50 MB USDZ) —
-# too heavy to commit; kept out of the repo for now.
-assets/models/quantego-two-1024.glb
-assets/models/quantego-two-1024.usdz
 _preview.html
