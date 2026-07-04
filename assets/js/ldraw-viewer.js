@@ -144,6 +144,37 @@ const ANATOMY = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// The superposition easter egg overlays two *different* machines — System One
+// and System Two, ghosted into one image — and measuring collapses to either.
+
+const TWIN = {
+  'quantego-one': { slug: 'quantego-two', self: 'System One', twin: 'System Two' },
+  'quantego-two': { slug: 'quantego-one', self: 'System Two', twin: 'System One' },
+};
+
+// The twin model is loaded once, prepared (upright, centred on the origin,
+// size cached) and shared; each superposition clones it.
+const twinCache = new Map();
+
+function loadTwin( url ) {
+  if ( ! twinCache.has( url ) ) {
+    twinCache.set( url, new Promise( ( resolve, reject ) => {
+      new LDrawLoader().load( url, g => {
+        g.rotation.x = Math.PI; // LDraw is Y-down
+        g.updateMatrixWorld( true );
+        const box = new THREE.Box3().setFromObject( g );
+        const size = box.getSize( new THREE.Vector3() );
+        g.position.sub( box.getCenter( new THREE.Vector3() ) );
+        g.userData.size = size;
+        g.userData.maxDim = Math.max( size.x, size.y, size.z );
+        resolve( g );
+      }, undefined, reject );
+    } ) );
+  }
+  return twinCache.get( url );
+}
+
 function createViewer( container, modelUrl ) {
 
   const renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
@@ -177,6 +208,7 @@ function createViewer( container, modelUrl ) {
 
   let model = null;
   let modelMaxDim = 100;
+  let modelSizeY = 100; // model height; the superposition twin stands on the same ground
   let brickGroups = null; // cached per-brick groups with rest/explode data
   let buildAnim = null; // active falling-bricks animation state, or null
   let hasAutoPlayed = false;
@@ -257,6 +289,7 @@ function createViewer( container, modelUrl ) {
 
     const maxDim = Math.max( size.x, size.y, size.z );
     modelMaxDim = maxDim;
+    modelSizeY = size.y;
     const dist = ( maxDim / 2 ) / Math.tan( ( camera.fov / 2 ) * Math.PI / 180 ) * 1.6;
     camera.position.set( dist * 0.85, dist * 0.55, dist );
     camera.near = maxDim / 100;
@@ -350,7 +383,7 @@ function createViewer( container, modelUrl ) {
   // Puts the model back into the plain assembled state before another feature
   // takes over: no build animation, no explode, no step filter, no ghost.
   function normalizeState() {
-    if ( ghost ) collapseGhost( null ); // instant teardown, no measurement
+    collapseGhost( null ); // instant teardown (also cancels a twin still loading)
     if ( buildAnim ) finishBuild();
     if ( stepMode ) exitStepMode();
     clearAllHighlights();
@@ -388,7 +421,7 @@ function createViewer( container, modelUrl ) {
   // Safe to call repeatedly (e.g. from the Start button); restarts from the top.
   function playBuild() {
     if ( ! model ) return;
-    if ( ghost ) collapseGhost( null );
+    collapseGhost( null );
     if ( stepMode ) exitStepMode();
     finishBuild(); // reset any in-flight build / explode before restarting
     const a = ensureBuildTimeline();
@@ -464,7 +497,7 @@ function createViewer( container, modelUrl ) {
   // User grabbed the scrubber: hold the build at the dragged position.
   function onScrubInput() {
     if ( stepMode ) exitStepMode();
-    if ( ghost ) collapseGhost( null );
+    collapseGhost( null );
     const a = ensureBuildTimeline();
     if ( ! a ) return;
     a.scrubbing = true;
@@ -520,7 +553,7 @@ function createViewer( container, modelUrl ) {
   function toggleExplode() {
     if ( ! model ) return;
     restartAt = null; // exploring pauses the auto-loop
-    if ( ghost ) collapseGhost( null );
+    collapseGhost( null );
     if ( stepMode ) exitStepMode();
     if ( buildAnim ) finishBuild(); // can't explode mid-build
     ensureBrickData();
@@ -576,7 +609,7 @@ function createViewer( container, modelUrl ) {
 
   function enterStepMode( n ) {
     if ( ! model ) return;
-    if ( ghost ) collapseGhost( null );
+    collapseGhost( null );
     if ( buildAnim ) finishBuild();
     exploded = false;
     explodeTarget = 0;
@@ -1041,12 +1074,23 @@ function createViewer( container, modelUrl ) {
     return { a: make(), b: make() };
   }
 
+  let ghostToken = 0; // invalidates a twin model still loading
+
   function toggleSuperposition() {
-    if ( ! model ) return;
+    if ( ! model || ! TWIN[ slug ] ) return;
     if ( ghost ) { measure(); return; }
     normalizeState();
     closeTour();
     hideChip();
+    const cfg = TWIN[ slug ];
+    const tok = ++ ghostToken;
+    loadTwin( modelUrl.replace( slug, cfg.slug ) ).then( twin => {
+      if ( tok !== ghostToken || ghost || ! model ) return; // user moved on
+      beginSuperposition( twin, cfg );
+    } ).catch( () => {} );
+  }
+
+  function beginSuperposition( twin, cfg ) {
     controls.autoRotate = false;
 
     const sets = ghostMaterialSet();
@@ -1064,7 +1108,7 @@ function createViewer( container, modelUrl ) {
       }
     } );
 
-    const copy = model.clone( true );
+    const copy = twin.clone( true );
     copy.traverse( c => {
       if ( c.isMesh ) {
         c.material = Array.isArray( c.material ) ? c.material.map( sets.b ) : sets.b( c.material );
@@ -1073,16 +1117,35 @@ function createViewer( container, modelUrl ) {
         c.visible = false;
       }
     } );
+    // Both machines stand on the same ground plane.
+    copy.position.y += ( twin.userData.size.y - modelSizeY ) / 2;
     scene.add( copy );
 
-    ghost = { copy, matsA, matsB, lines, origByMesh, start: performance.now(), collapsing: null };
+    ghost = {
+      copy, matsA, matsB, lines, origByMesh,
+      start: performance.now(), collapsing: null, done: false, timer: 0,
+      nameA: cfg.self, nameB: cfg.twin,
+    };
+
+    // If the twin is the bigger machine, ease the camera out to fit it.
+    const need = Math.max( modelMaxDim, twin.userData.maxDim );
+    const dist = ( need / 2 ) / Math.tan( ( camera.fov / 2 ) * Math.PI / 180 ) * 1.6;
+    const cur = camera.position.distanceTo( controls.target );
+    if ( dist > cur ) {
+      camTween = {
+        p0: camera.position.clone(),
+        p1: camera.position.clone().sub( controls.target ).multiplyScalar( dist / cur ).add( controls.target ),
+        t0: controls.target.clone(), t1: controls.target.clone(),
+        start: performance.now(), dur: reduceMotion ? 1 : 600,
+      };
+    }
 
     if ( ! psiHint ) {
       psiHint = document.createElement( 'div' );
       psiHint.className = 'viewer-psi-hint';
-      psiHint.textContent = 'ψ  The model is in a superposition of two states — click it to measure.';
       container.appendChild( psiHint );
     }
+    psiHint.textContent = `0 and 1 at once: a superposition of ${cfg.self} and ${cfg.twin} — click it to measure.`;
     psiHint.classList.add( 'is-open' );
   }
 
@@ -1093,20 +1156,21 @@ function createViewer( container, modelUrl ) {
     if ( psiHint ) psiHint.classList.remove( 'is-open' );
   }
 
-  // Tears the superposition down. With an outcome (0 = original pose, 1 = the
-  // rotated twin) it snaps the survivor's pose; with null it just cleans up.
-  function collapseGhost( outcome ) {
+  // Tears the superposition down (or cancels a twin still loading) and puts
+  // the viewer's own model back. resumeSpin restarts the idle auto-rotate;
+  // callers that immediately take over (build, step, explode) pass null.
+  function collapseGhost( resumeSpin ) {
+    ghostToken ++;
     if ( ! ghost ) return;
+    clearTimeout( ghost.timer );
     scene.remove( ghost.copy );
     for ( const [ mesh, mat ] of ghost.origByMesh ) mesh.material = mat;
     for ( const l of ghost.lines ) l.visible = true;
+    model.visible = true;
     model.rotation.y = 0;
     ghost = null;
     if ( psiHint ) psiHint.classList.remove( 'is-open' );
-    if ( outcome !== null ) {
-      toast( `Measured: |${outcome}⟩ — the superposition collapsed.` );
-      controls.autoRotate = ! reduceMotion;
-    }
+    if ( resumeSpin ) controls.autoRotate = ! reduceMotion;
   }
 
   function stepGhost() {
@@ -1122,11 +1186,18 @@ function createViewer( container, modelUrl ) {
       for ( const m of dropMats ) m.opacity = 0.42 * ( 1 - t );
       const keepObj = outcome === 0 ? model : ghost.copy;
       keepObj.rotation.y *= ( 1 - t );
-      if ( t >= 1 ) collapseGhost( outcome );
+      if ( t >= 1 && ! ghost.done ) {
+        // Hold the survivor on screen for a beat, then quietly restore the
+        // section's own model.
+        ghost.done = true;
+        if ( outcome === 1 ) model.visible = false;
+        toast( `Measured: |${outcome}⟩ — it collapsed to ${outcome === 0 ? ghost.nameA : ghost.nameB}.` );
+        ghost.timer = setTimeout( () => collapseGhost( true ), 2800 );
+      }
       return;
     }
 
-    // Idle superposition: the two states breathe apart around the rest pose.
+    // Idle superposition: the two machines breathe apart around the rest pose.
     const t = ( now - ghost.start ) / 1000;
     const spread = 0.3 + 0.06 * Math.sin( t * 1.7 );
     model.rotation.y = - spread;
@@ -1193,16 +1264,22 @@ function createViewer( container, modelUrl ) {
     // Small icon-only extras on their own row.
     const extras = document.createElement( 'div' );
     extras.className = 'viewer-extras';
-    const psi = viewerButton( 'ψ', toggleSuperposition );
-    psi.title = 'Superposition: view the model in two states at once, then click to measure';
-    psi.setAttribute( 'aria-label', 'Superposition easter egg' );
+    if ( TWIN[ slug ] ) {
+      // Icon: a 0 and a 1 overlapping — both states at once.
+      const psi = viewerButton( '', toggleSuperposition );
+      psi.classList.add( 'viewer-psi-btn' );
+      psi.innerHTML = '<span class="psi-0">0</span><span class="psi-1">1</span>';
+      psi.title = 'Superposition: System One and System Two at once — click the model to measure';
+      psi.setAttribute( 'aria-label', 'Superposition easter egg' );
+      extras.appendChild( psi );
+    }
     const shot = viewerButton( '📸', screenshot );
     shot.title = 'Save a screenshot of this view';
     shot.setAttribute( 'aria-label', 'Save screenshot' );
     const share = viewerButton( '🔗', shareView );
     share.title = 'Copy a link to this exact view';
     share.setAttribute( 'aria-label', 'Copy link to this view' );
-    extras.append( psi, shot, share );
+    extras.append( shot, share );
 
     container.append( bar, extras );
 
@@ -1251,18 +1328,20 @@ function createViewer( container, modelUrl ) {
       identifyAt( e );
     } );
 
-    // The quantum simulator lower on the page "runs" its circuits here: every
-    // run sends a pulse that ripples through the bricks.
-    window.addEventListener( 'quantego:pulse', () => {
-      container.classList.remove( 'is-pulsing' );
-      void container.offsetWidth; // restart the CSS animation
-      container.classList.add( 'is-pulsing' );
-      if ( model && ! buildAnim && ! ghost && ! stepMode && ! reduceMotion ) {
-        ensureBrickData();
-        explodeTarget = Math.max( explodeTarget, 0.18 );
-        setTimeout( () => { explodeTarget = exploded ? 1 : 0; }, 420 );
-      }
-    } );
+    // The quantum simulator sits right below the 1024-brick model and "runs"
+    // on it: every run sends a pulse that ripples through these bricks only.
+    if ( slug === 'quantego-two-1024' ) {
+      window.addEventListener( 'quantego:pulse', () => {
+        container.classList.remove( 'is-pulsing' );
+        void container.offsetWidth; // restart the CSS animation
+        container.classList.add( 'is-pulsing' );
+        if ( model && ! buildAnim && ! ghost && ! stepMode && ! reduceMotion ) {
+          ensureBrickData();
+          explodeTarget = Math.max( explodeTarget, 0.18 );
+          setTimeout( () => { explodeTarget = exploded ? 1 : 0; }, 420 );
+        }
+      } );
+    }
   }
 
   // Opens a lightweight overlay with <model-viewer>; on a phone its AR button
@@ -1385,14 +1464,6 @@ function createCompareViewer( container, urls ) {
     loader.smoothNormals = false; // keep the combined (incl. 1024) scene snappy
     loader.load( url, g => { loaded[ i ] = g; if ( loaded.every( Boolean ) ) layout(); },
       undefined, err => console.error( 'LDraw compare load failed for', url, err ) );
-  } );
-
-  // The circuit simulator's pulse lights this viewer up too (glow only — the
-  // compare scene has no per-brick explode data).
-  window.addEventListener( 'quantego:pulse', () => {
-    container.classList.remove( 'is-pulsing' );
-    void container.offsetWidth;
-    container.classList.add( 'is-pulsing' );
   } );
 
   function layout() {

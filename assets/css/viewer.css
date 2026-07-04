@@ -44,6 +44,25 @@
   min-width: 2rem;
 }
 
+/* Superposition button: a 0 and a 1 overlapping — both states at once. */
+.viewer-psi-btn {
+  position: relative;
+  width: 2rem;
+  height: 1.75rem;
+}
+
+.viewer-psi-btn span {
+  position: absolute;
+  top: 50%;
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: .55;
+}
+
+.viewer-psi-btn .psi-0 { left: 44%; transform: translate(-50%, -50%); }
+.viewer-psi-btn .psi-1 { left: 58%; transform: translate(-50%, -50%); }
+
 /* Play/pause + drag-to-seek progress bar, pinned along the bottom edge. */
 .viewer-transport {
   position: absolute;

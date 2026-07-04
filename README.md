@@ -21,7 +21,7 @@ Currently, we feature three different versions: a LEGO model of IBM Quantum Syst
 For each of the models, build instructions and a parts list are provided.
 The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
 
-💡 **The 3D viewers below are interactive.** Drag to rotate and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, 🔗 copies a link to your exact view — and the ψ button hides a small quantum surprise.
+💡 **The 3D viewers below are interactive.** Drag to rotate and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, 🔗 copies a link to your exact view — and the overlapping **0/1** button hides a small quantum surprise.
 
 
 ## IBM Quantum System One
@@ -86,6 +86,12 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 <div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
 
+### Run a quantum circuit
+
+The real machine behind this model runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times — one shot per brick of the model above, which pulses with every run. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
+
+<div class="qsim"></div>
+
 You'll find more renders of the 1024-brick model in the [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) folder.
 
 Here are some photos of the built model; more will be posted in the [Photos](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Photos) folder.
@@ -114,12 +120,6 @@ All three models shown side by side at the same physical scale. Drag to rotate, 
 
 <div class="viewer-compare" data-models="/assets/models/quantego-one.mpd,/assets/models/quantego-two.mpd,/assets/models/quantego-two-1024.mpd"></div>
 
-
-## Run a quantum circuit
-
-The real machines behind these models run *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times (one shot per brick of the high-end model). Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
-
-<div class="qsim"></div>
 
 ## Kits
 
