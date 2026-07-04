@@ -202,6 +202,7 @@ function createViewer( container, modelUrl ) {
 
   // Part identification / highlight
   const highlightMats = new Map(); // original material -> emissive clone
+  const hlActive = new Map(); // mesh -> { count, orig }: refcounted live highlights
   let flashRestore = null; // pending restore for a click-flash
   let chip = null; // part-info card
   let chipTimer = null;
@@ -352,6 +353,7 @@ function createViewer( container, modelUrl ) {
     if ( ghost ) collapseGhost( null ); // instant teardown, no measurement
     if ( buildAnim ) finishBuild();
     if ( stepMode ) exitStepMode();
+    clearAllHighlights();
     if ( exploded || explodeFactor > 0.001 ) {
       exploded = false;
       explodeTarget = 0;
@@ -503,10 +505,13 @@ function createViewer( container, modelUrl ) {
     controls.autoRotate = ! reduceMotion && ! stepMode;
   }
 
-  // First time the viewer is both loaded and on screen, play the build once.
+  // First time the viewer is both loaded and on screen, play the build once —
+  // unless the user beat the autoplay to it (stepping, touring, ghosting or
+  // scrubbing before the IntersectionObserver fires must not be stomped).
   function maybeAutoPlay() {
     if ( hasAutoPlayed || reduceMotion || ! model || ! visible ) return;
     hasAutoPlayed = true;
+    if ( stepMode || ghost || buildAnim || ( tour && tour.open ) ) return;
     playBuild();
   }
 
@@ -586,7 +591,7 @@ function createViewer( container, modelUrl ) {
   function exitStepMode() {
     if ( ! stepMode ) return;
     stepMode = false;
-    stepFlash = null;
+    clearStepFlash();
     setStatus( '' );
     if ( model ) for ( const g of ensureBrickData() ) g.visible = true;
     controls.autoRotate = ! reduceMotion;
@@ -597,10 +602,17 @@ function createViewer( container, modelUrl ) {
     applyStep();
     const cap = stepCaption( n );
     setStatus( `Step ${n + 1} / ${numSteps}${cap ? ' · ' + cap : ''}` );
+    clearStepFlash(); // stepping fast must not strand the previous flash
     if ( ! reduceMotion ) {
       const fresh = ensureBrickData().filter( g => g.userData.step === n );
       stepFlash = { bricks: fresh, until: performance.now() + 750, applied: false };
     }
+  }
+
+  // Restores a still-applied step flash before dropping it.
+  function clearStepFlash() {
+    if ( stepFlash && stepFlash.applied ) stepFlash.restore();
+    stepFlash = null;
   }
 
   function applyStep() {
@@ -639,9 +651,12 @@ function createViewer( container, modelUrl ) {
 
   // Swaps the mesh materials of the given bricks for an emissive-tinted clone;
   // returns a function that restores the originals. Clones are cached per
-  // source material, so repeated highlights are cheap.
+  // source material, so repeated highlights are cheap. Highlights overlap
+  // (step flash + click flash + parts selection can hit the same brick), so
+  // they are refcounted per mesh: the true original material is captured once,
+  // and only the last restore puts it back — a late restore can never
+  // resurrect a highlight clone as the "original".
   function swapHighlight( bricks ) {
-    const swapped = [];
     const hl = m => {
       if ( ! m || ! m.isMaterial || ! ( 'emissive' in m ) ) return m;
       if ( ! highlightMats.has( m ) ) {
@@ -652,15 +667,41 @@ function createViewer( container, modelUrl ) {
       }
       return highlightMats.get( m );
     };
+    const meshes = [];
     for ( const g of bricks ) {
       for ( const c of g.children ) {
         if ( ! c.isMesh ) continue;
-        const orig = c.material;
-        c.material = Array.isArray( orig ) ? orig.map( hl ) : hl( orig );
-        swapped.push( [ c, orig ] );
+        let entry = hlActive.get( c );
+        if ( ! entry ) {
+          entry = { count: 0, orig: c.material };
+          hlActive.set( c, entry );
+          c.material = Array.isArray( entry.orig ) ? entry.orig.map( hl ) : hl( entry.orig );
+        }
+        entry.count ++;
+        meshes.push( c );
       }
     }
-    return () => { for ( const [ c, orig ] of swapped ) c.material = orig; };
+    let restored = false;
+    return () => {
+      if ( restored ) return;
+      restored = true;
+      for ( const c of meshes ) {
+        const entry = hlActive.get( c );
+        if ( entry && -- entry.count <= 0 ) {
+          c.material = entry.orig;
+          hlActive.delete( c );
+        }
+      }
+    };
+  }
+
+  // Undoes every live highlight (step flash, click flash, parts selection) so
+  // features that capture materials directly — the superposition ghost — never
+  // see a highlight clone as the brick's real material.
+  function clearAllHighlights() {
+    clearStepFlash();
+    if ( flashRestore ) { flashRestore(); flashRestore = null; }
+    clearPartsSelection();
   }
 
   // The brick a rendered object belongs to: nearest ancestor named like an
@@ -885,6 +926,7 @@ function createViewer( container, modelUrl ) {
     }
     tour.open = true;
     tour.dotsEl.style.display = '';
+    container.classList.add( 'is-touring' ); // mobile CSS declutters the frame
     controls.autoRotate = false;
     openSpot( 0 );
   }
@@ -895,6 +937,7 @@ function createViewer( container, modelUrl ) {
     tour.idx = - 1;
     tour.dotsEl.style.display = 'none';
     tour.card.classList.remove( 'is-open' );
+    container.classList.remove( 'is-touring' );
     camTween = null;
     controls.autoRotate = ! reduceMotion && ! stepMode;
   }

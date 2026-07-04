@@ -6,7 +6,8 @@
 //
 // H, X, Z and CNOT all have real-valued matrices, so amplitudes stay real and
 // the state fits in one Float64Array(8). Qubit i is bit i of the state index;
-// ket labels read top wire first: |q0 q1 q2⟩.
+// ket labels are little-endian as on IBM Quantum / Qiskit: |q2 q1 q0⟩, so the
+// top wire q0 is the rightmost bit.
 
 const QUBITS = 3;
 const COLS = 6;
@@ -14,16 +15,17 @@ const SHOTS = 1024;
 const DIM = 1 << QUBITS;
 
 const GATES = {
-  H: { m: [ 1 / Math.SQRT2, 1 / Math.SQRT2, 1 / Math.SQRT2, - 1 / Math.SQRT2 ], label: 'H', hint: 'Hadamard — puts a qubit into an equal superposition of 0 and 1' },
-  X: { m: [ 0, 1, 1, 0 ], label: 'X', hint: 'NOT — flips 0 to 1 and 1 to 0' },
-  Z: { m: [ 1, 0, 0, - 1 ], label: 'Z', hint: 'Phase flip — leaves 0 alone, negates the amplitude of 1' },
-  CX: { label: '●', hint: 'CNOT — flips the qubit below whenever this qubit is 1. This is what entangles qubits' },
+  H: { m: [ 1 / Math.SQRT2, 1 / Math.SQRT2, 1 / Math.SQRT2, - 1 / Math.SQRT2 ], hint: 'Hadamard — puts a qubit into an equal superposition of 0 and 1' },
+  X: { m: [ 0, 1, 1, 0 ], hint: 'NOT — flips 0 to 1 and 1 to 0' },
+  Z: { m: [ 1, 0, 0, - 1 ], hint: 'Phase flip — leaves 0 alone, negates the amplitude of 1' },
+  CX: { hint: 'CNOT — flips the target ⊕ whenever the control ● is 1. This is what entangles qubits' },
 };
 
+// Preset circuits: singles are { g, q, col }, CNOTs are { g: 'CX', c, t, col }.
 const PRESETS = {
-  'Coin flip': [ [ 0, 0, 'H' ] ],
-  'Bell pair': [ [ 0, 0, 'H' ], [ 0, 1, 'CX' ] ],
-  'GHZ state': [ [ 0, 0, 'H' ], [ 0, 1, 'CX' ], [ 1, 2, 'CX' ] ],
+  'Coin flip': [ { g: 'H', q: 0, col: 0 } ],
+  'Bell pair': [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 } ],
+  'GHZ state': [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 }, { g: 'CX', c: 1, t: 2, col: 2 } ],
 };
 
 function applySingle( state, m, q ) {
@@ -48,16 +50,21 @@ function applyCX( state, c, t ) {
   }
 }
 
+// circuit[q][col] holds 'H' | 'X' | 'Z' | null for single-qubit gates, or the
+// pieces of a CNOT: 'CX' (control), 'CXT' (target), 'CXL' (a wire the CNOT's
+// connector line crosses — kept occupied so nothing else lands under the line).
 function simulate( circuit ) {
   const state = new Float64Array( DIM );
   state[ 0 ] = 1;
   for ( let col = 0; col < COLS; col ++ ) {
+    let c = - 1, t = - 1;
     for ( let q = 0; q < QUBITS; q ++ ) {
       const cell = circuit[ q ][ col ];
-      if ( ! cell || cell === 'CXT' ) continue;
-      if ( cell === 'CX' ) applyCX( state, q, q + 1 );
-      else applySingle( state, GATES[ cell ].m, q );
+      if ( cell === 'CX' ) c = q;
+      else if ( cell === 'CXT' ) t = q;
+      else if ( cell && cell !== 'CXL' ) applySingle( state, GATES[ cell ].m, q );
     }
+    if ( c >= 0 && t >= 0 ) applyCX( state, c, t );
   }
   return state;
 }
@@ -73,11 +80,15 @@ function sample( state ) {
   return counts;
 }
 
+// Little-endian ket label: highest qubit first, q0 as the rightmost bit.
 function ket( k ) {
   let s = '';
-  for ( let q = 0; q < QUBITS; q ++ ) s += ( k >> q ) & 1;
+  for ( let q = QUBITS - 1; q >= 0; q -- ) s += ( k >> q ) & 1;
   return s;
 }
+
+const SUB = '₀₁₂₃₄₅₆₇₈₉';
+function wireName( q ) { return 'q' + SUB[ q ]; }
 
 function el( tag, cls, text ) {
   const e = document.createElement( tag );
@@ -94,9 +105,9 @@ function btn( cls, text, onClick ) {
 }
 
 function createSim( container ) {
-  // circuit[q][col] = null | 'H' | 'X' | 'Z' | 'CX' (control) | 'CXT' (target)
   const circuit = Array.from( { length: QUBITS }, () => new Array( COLS ).fill( null ) );
   let tool = 'H';
+  let pending = null; // { q, col } — a CNOT control waiting for its target
   const cells = []; // cells[q][col] -> button
 
   // --- toolbar: gate palette + presets -------------------------------------
@@ -116,14 +127,16 @@ function createSim( container ) {
 
   const presets = el( 'div', 'qsim-row' );
   presets.appendChild( el( 'span', 'qsim-rowlabel', 'Presets' ) );
-  for ( const [ name, gates ] of Object.entries( PRESETS ) ) {
-    presets.appendChild( btn( 'qsim-preset', name, () => loadPreset( gates ) ) );
+  for ( const [ name, ops ] of Object.entries( PRESETS ) ) {
+    presets.appendChild( btn( 'qsim-preset', name, () => loadPreset( ops ) ) );
   }
   presets.appendChild( btn( 'qsim-preset', 'Clear', () => loadPreset( [] ) ) );
 
   function setTool( t ) {
     tool = t;
+    pending = null;
     for ( const [ k, b ] of Object.entries( toolBtns ) ) b.classList.toggle( 'is-active', k === t );
+    paint();
   }
 
   // --- circuit grid ---------------------------------------------------------
@@ -131,7 +144,7 @@ function createSim( container ) {
   grid.setAttribute( 'role', 'grid' );
   for ( let q = 0; q < QUBITS; q ++ ) {
     const row = el( 'div', 'qsim-wire' );
-    row.appendChild( el( 'span', 'qsim-wirelabel', `q${q}` ) );
+    row.appendChild( el( 'span', 'qsim-wirelabel', wireName( q ) ) );
     cells[ q ] = [];
     for ( let col = 0; col < COLS; col ++ ) {
       const c = btn( 'qsim-cell', '', () => onCell( q, col ) );
@@ -142,61 +155,118 @@ function createSim( container ) {
     grid.appendChild( row );
   }
 
-  // Removes whatever occupies (q, col), including a CNOT's other half.
+  // One-line helper text under the grid; doubles as the CNOT placement prompt
+  // (title tooltips don't exist on touch screens).
+  const hint = el( 'div', 'qsim-hint' );
+
+  // Removes whatever occupies (q, col). Any piece of a CNOT removes the whole
+  // CNOT — control, target and crossed wires alike.
   function clearCell( q, col ) {
     const v = circuit[ q ][ col ];
-    if ( v === 'CX' && q + 1 < QUBITS && circuit[ q + 1 ][ col ] === 'CXT' ) circuit[ q + 1 ][ col ] = null;
-    if ( v === 'CXT' && q > 0 && circuit[ q - 1 ][ col ] === 'CX' ) circuit[ q - 1 ][ col ] = null;
-    circuit[ q ][ col ] = null;
+    if ( v === 'CX' || v === 'CXT' || v === 'CXL' ) {
+      for ( let i = 0; i < QUBITS; i ++ ) {
+        const w = circuit[ i ][ col ];
+        if ( w === 'CX' || w === 'CXT' || w === 'CXL' ) circuit[ i ][ col ] = null;
+      }
+    } else {
+      circuit[ q ][ col ] = null;
+    }
+  }
+
+  function placeCX( c, t, col ) {
+    // A column holds at most one CNOT: drop any existing one, then claim the
+    // whole control-to-target span (overwriting any single gates on the way).
+    for ( let i = 0; i < QUBITS; i ++ ) {
+      const w = circuit[ i ][ col ];
+      if ( w === 'CX' || w === 'CXT' || w === 'CXL' ) circuit[ i ][ col ] = null;
+    }
+    for ( let i = Math.min( c, t ); i <= Math.max( c, t ); i ++ ) circuit[ i ][ col ] = 'CXL';
+    circuit[ c ][ col ] = 'CX';
+    circuit[ t ][ col ] = 'CXT';
   }
 
   function onCell( q, col ) {
-    const cur = circuit[ q ][ col ];
-    if ( tool === 'ERASE' ) {
-      clearCell( q, col );
-    } else if ( tool === 'CX' ) {
-      const control = q < QUBITS - 1 ? q : q - 1; // bottom wire: place upward
-      if ( circuit[ control ][ col ] === 'CX' ) {
-        clearCell( control, col );
+    if ( tool === 'CX' ) {
+      const v = circuit[ q ][ col ];
+      if ( pending && pending.col === col && pending.q === q ) {
+        pending = null; // tapping the pending control again cancels it
+      } else if ( pending && pending.col === col ) {
+        const control = pending.q;
+        pending = null;
+        placeCX( control, q, col );
+      } else if ( v === 'CX' || v === 'CXT' || v === 'CXL' ) {
+        pending = null;
+        clearCell( q, col ); // tap an existing CNOT to remove it
       } else {
-        clearCell( control, col );
-        clearCell( control + 1, col );
-        circuit[ control ][ col ] = 'CX';
-        circuit[ control + 1 ][ col ] = 'CXT';
+        pending = { q, col }; // first click: place the control
       }
+    } else if ( tool === 'ERASE' ) {
+      pending = null;
+      clearCell( q, col );
     } else {
+      pending = null;
+      const cur = circuit[ q ][ col ];
       clearCell( q, col );
       if ( cur !== tool ) circuit[ q ][ col ] = tool;
     }
     paint();
   }
 
-  function loadPreset( gates ) {
+  function loadPreset( ops ) {
+    pending = null;
     for ( let q = 0; q < QUBITS; q ++ ) circuit[ q ].fill( null );
-    for ( const [ q, col, g ] of gates ) {
-      circuit[ q ][ col ] = g;
-      if ( g === 'CX' ) circuit[ q + 1 ][ col ] = 'CXT';
+    for ( const op of ops ) {
+      if ( op.g === 'CX' ) placeCX( op.c, op.t, op.col );
+      else circuit[ op.q ][ op.col ] = op.g;
     }
     paint();
   }
 
+  function hintText() {
+    if ( tool === 'CX' ) {
+      return pending
+        ? `Control on ${wireName( pending.q )} — now click the target qubit in the same column (click ● again to cancel).`
+        : 'Click a cell to place the control ●, then click the target qubit ⊕ in the same column.';
+    }
+    if ( tool === 'ERASE' ) return 'Click a gate to remove it.';
+    return GATES[ tool ].hint + '.';
+  }
+
   function paint() {
-    for ( let q = 0; q < QUBITS; q ++ ) {
-      for ( let col = 0; col < COLS; col ++ ) {
+    for ( let col = 0; col < COLS; col ++ ) {
+      let c = - 1, t = - 1;
+      for ( let q = 0; q < QUBITS; q ++ ) {
+        if ( circuit[ q ][ col ] === 'CX' ) c = q;
+        else if ( circuit[ q ][ col ] === 'CXT' ) t = q;
+      }
+      const lo = Math.min( c, t ), hi = Math.max( c, t );
+      for ( let q = 0; q < QUBITS; q ++ ) {
         const v = circuit[ q ][ col ];
-        const c = cells[ q ][ col ];
-        c.textContent = v === 'CX' ? '●' : v === 'CXT' ? '⊕' : v || '';
-        c.classList.toggle( 'has-gate', !! v );
-        c.classList.toggle( 'is-cx-control', v === 'CX' );
-        c.classList.toggle( 'is-cx-target', v === 'CXT' );
+        const cell = cells[ q ][ col ];
+        const isPend = pending && pending.q === q && pending.col === col;
+        cell.textContent = isPend || v === 'CX' ? '●' : v === 'CXT' ? '⊕' : v === 'CXL' ? '' : v || '';
+        cell.classList.toggle( 'has-gate', !! v && v !== 'CXL' );
+        cell.classList.toggle( 'is-cx-target', v === 'CXT' );
+        cell.classList.toggle( 'is-cx-pending', !! isPend );
+        // Vertical connector: down from every span cell above the bottom end,
+        // up into every span cell below the top end (control can be either end).
+        const inSpan = c >= 0 && t >= 0 && q >= lo && q <= hi;
+        cell.classList.toggle( 'cx-down', inSpan && q < hi );
+        cell.classList.toggle( 'cx-up', inSpan && q > lo );
       }
     }
+    hint.textContent = hintText();
   }
 
   // --- run + histogram -------------------------------------------------------
   const run = btn( 'qsim-run', `▶ Run ${SHOTS} shots`, () => {
     const counts = sample( simulate( circuit ) );
     renderResults( counts );
+    // Local feedback (the panel itself glows) plus the page-wide pulse the
+    // 3D viewers react to.
+    container.classList.remove( 'is-pulsing' );
+    void container.offsetWidth; // restart the CSS animation
+    container.classList.add( 'is-pulsing' );
     window.dispatchEvent( new CustomEvent( 'quantego:pulse' ) );
   } );
   run.title = `Simulate the circuit and measure all ${QUBITS} qubits, ${SHOTS} times`;
@@ -220,10 +290,11 @@ function createSim( container ) {
       row.appendChild( el( 'span', 'qsim-bar-count', String( n ) ) );
       results.appendChild( row );
     } );
-    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser — watch the LEGO models above light up on every run.' ) );
+    results.appendChild( el( 'div', 'qsim-note', `Kets are little-endian, as on IBM Quantum: |${wireName( 2 )}${wireName( 1 )}${wireName( 0 )}⟩ — the top wire ${wireName( 0 )} is the rightmost bit.` ) );
+    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also sends a pulse through the 3D LEGO models on this page — keep one on screen to watch its bricks jump.' ) );
   }
 
-  container.append( palette, presets, grid, run, results );
+  container.append( palette, presets, grid, hint, run, results );
   setTool( 'H' );
   loadPreset( PRESETS[ 'Bell pair' ] );
 }

@@ -286,8 +286,10 @@
 
 .viewer-toast.is-open { opacity: 1; transform: translate(-50%, 0); }
 
-/* The circuit simulator "runs" on the models: a brief glow ripples the page. */
-.viewer.is-pulsing, .viewer-compare.is-pulsing {
+/* The circuit simulator "runs" on the models: a brief glow ripples the page.
+   The simulator panel itself glows too, so the run is felt even when no 3D
+   viewer is on screen. */
+.viewer.is-pulsing, .viewer-compare.is-pulsing, .qsim.is-pulsing {
   animation: viewer-pulse 1.1s ease-out;
 }
 
@@ -363,6 +365,25 @@
 @media (max-width: 600px) {
   .viewer { aspect-ratio: 4 / 3; }
   .viewer-status { max-width: 45%; } /* keep the scrubber usable next to it */
+
+  /* Keep the tour card from covering the model on small screens: compact
+     type, capped height, and scroll inside the card if the text runs long. */
+  .viewer-tourcard {
+    max-height: 44%;
+    overflow-y: auto;
+    padding: .45rem .6rem;
+    font-size: .74rem;
+  }
+  .viewer-tourcard p { margin: .2rem 0 .35rem; line-height: 1.3; }
+  .viewer-tourcard-nav .viewer-btn { padding: .1rem .5rem; }
+
+  /* While the tour is open, clear everything else out of the small frame so
+     the model stays visible: only the hotspot dots and the card remain (the
+     card's ✕ ends the tour and brings the buttons back). */
+  .viewer.is-touring .viewer-controls,
+  .viewer.is-touring .viewer-extras,
+  .viewer.is-touring .viewer-transport { display: none; }
+  .viewer.is-touring .viewer-tourcard { bottom: 8px; }
 }
 
 /* ------------------------------------------------------------------------- */
@@ -407,7 +428,15 @@
 .qsim-tool:hover, .qsim-preset:hover, .qsim-run:hover { background: #f2f6fa; }
 .qsim-tool.is-active { background: #dbeafe; border-color: #1a7fd4; }
 
-.qsim-grid { margin: .8rem 0; }
+.qsim-grid { margin: .8rem 0 .3rem; }
+
+/* Helper line under the grid: gate explanations + the CNOT placement prompt. */
+.qsim-hint {
+  min-height: 1.1em;
+  margin: 0 0 .7rem;
+  font-size: .74rem;
+  color: #57606a;
+}
 
 .qsim-wire {
   display: flex;
@@ -445,9 +474,11 @@
   border: 1.5px solid #1a7fd4;
 }
 
-/* CNOT: the control dot links down to its ⊕ target on the wire below. */
-.qsim-cell.is-cx-control::after,
-.qsim-cell.is-cx-target::before {
+/* CNOT connector: each cell in the control-to-target span draws its share of
+   the vertical line (down toward the far end, up toward the near end), so the
+   control can sit above or below the target and even span the middle wire. */
+.qsim-cell.cx-down::after,
+.qsim-cell.cx-up::before {
   content: "";
   position: absolute;
   left: 50%;
@@ -456,9 +487,16 @@
   background: #1a7fd4;
 }
 
-.qsim-cell.is-cx-control::after { top: 50%; bottom: -3px; }
-.qsim-cell.is-cx-target::before { top: -3px; bottom: 50%; }
+.qsim-cell.cx-down::after { top: 50%; bottom: -3px; }
+.qsim-cell.cx-up::before { top: -3px; bottom: 50%; }
 .qsim-cell.is-cx-target { color: #1a7fd4; }
+
+/* A CNOT control waiting for its target to be clicked. */
+.qsim-cell.is-cx-pending {
+  color: #1a7fd4;
+  background-color: #fff;
+  border: 1.5px dashed #1a7fd4;
+}
 
 .qsim-run {
   padding: .45rem .9rem;
