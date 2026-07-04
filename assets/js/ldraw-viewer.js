@@ -1436,19 +1436,22 @@ function createViewer( container, modelUrl ) {
     }
   }
 
-  // The chandelier: the pearl-gold stages and white platters hanging inside
-  // the Cryostat submodel of the System Two model.
+  // The chandelier: the pearl-gold stages, lightsaber rods and white platters
+  // hanging inside the Cryostat submodel of the System Two model. The colour
+  // check walks the whole ancestor chain because alias parts (the lightsabers:
+  // 577b -> 64567a) carry their colour on an outer group while the mesh sits
+  // in a nested "inherit colour" subgroup.
   let chandelier = null;
   function chandelierBricks() {
     if ( ! chandelier ) {
       chandelier = ensureBrickData().filter( g => {
-        let inCryostat = false;
-        for ( let a = g.parent; a && a !== scene; a = a.parent ) {
-          if ( a.name && /cryostat/i.test( a.name ) ) { inCryostat = true; break; }
+        let inCryostat = false, goldOrWhite = false;
+        for ( let a = g; a && a !== scene; a = a.parent ) {
+          const code = a.userData ? String( a.userData.colorCode ) : '';
+          if ( code === '297' || code === '15' ) goldOrWhite = true; // Pearl_Gold, White
+          if ( a.name && /cryostat/i.test( a.name ) ) inCryostat = true;
         }
-        if ( ! inCryostat ) return false;
-        const code = String( g.userData.colorCode );
-        return code === '297' || code === '15'; // Pearl_Gold and White
+        return inCryostat && goldOrWhite;
       } );
     }
     return chandelier;
