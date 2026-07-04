@@ -276,7 +276,7 @@ function createSim( container ) {
   function renderResults( counts ) {
     results.innerHTML = '';
     const max = Math.max( ...counts, 1 );
-    results.appendChild( el( 'div', 'qsim-results-title', `Measurement results — ${SHOTS} shots (one per brick of the 1024-brick model)` ) );
+    results.appendChild( el( 'div', 'qsim-results-title', `Measurement results — ${SHOTS} shots (one per brick of the 1024-brick model further down)` ) );
     counts.forEach( ( n, k ) => {
       const row = el( 'div', 'qsim-bar-row' );
       const pct = ( n / SHOTS * 100 ).toFixed( 1 );
@@ -291,7 +291,7 @@ function createSim( container ) {
       results.appendChild( row );
     } );
     results.appendChild( el( 'div', 'qsim-note', `Kets are little-endian, as on IBM Quantum: |${wireName( 2 )}${wireName( 1 )}${wireName( 0 )}⟩ — the top wire ${wireName( 0 )} is the rightmost bit.` ) );
-    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also sends a pulse through the 1024-brick model above — one shot per brick.' ) );
+    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also flashes the golden chandelier inside the cryostat above — in the real machine, that is where the qubits live.' ) );
   }
 
   container.append( palette, presets, grid, hint, run, results );
