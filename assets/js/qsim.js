@@ -291,7 +291,7 @@ function createSim( container ) {
       results.appendChild( row );
     } );
     results.appendChild( el( 'div', 'qsim-note', `Kets are little-endian, as on IBM Quantum: |${wireName( 2 )}${wireName( 1 )}${wireName( 0 )}⟩ — the top wire ${wireName( 0 )} is the rightmost bit.` ) );
-    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also sends a pulse through the 3D LEGO models on this page — keep one on screen to watch its bricks jump.' ) );
+    results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also sends a pulse through the 1024-brick model above — one shot per brick.' ) );
   }
 
   container.append( palette, presets, grid, hint, run, results );
