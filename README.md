@@ -1,6 +1,6 @@
 # Quantego
 
-## Quantego is a family of Lego models of IBM Quantum Computers
+## Quantego is a family of LEGO models of IBM quantum computers
 
 <link rel="stylesheet" href="/assets/css/viewer.css">
 <script type="importmap">
@@ -10,19 +10,18 @@
 } }
 </script>
 
-The first version of Quantego has been created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
+The first version of Quantego was created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
   <img src="First-Quantego.jpg" alt="Quantego" width="300"/>
 </p>
 
-Currently, we feature two different versions:
-A Lego model of IBM Quantum System *One* made of 49 bricks and a model of IBM Quantum System *Two* made of 105 bricks. 
+Currently, we feature two different versions: a LEGO model of IBM Quantum System *One* (49 bricks) and one of IBM Quantum System *Two* (105 bricks).
 
-For each of the models, build instructions and a parts list is being made available. 
-The instructions and the digital pictures and animations have been created with [bricklink studio](https://www.bricklink.com/v3/studio/main.page) lego digital design software. Part numbers (3001, 4201, etc) are as on [bricklink](https://www.bricklink.com/). 
+For each of the models, build instructions and a parts list are provided.
+The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
 
-We expect to make a much more sophisticated model of IBM Quantum System Two - made of 1024 bricks - available very soon. Stay tuned.
+We also feature a much more sophisticated, 1024-brick model of IBM Quantum System Two — see below.
 
 
 ## IBM Quantum System One
@@ -50,7 +49,7 @@ Build instructions can be found [here](Quantego-One/Quantego-One-v05-instruction
 
 ### Digital design
 
-The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into [bricklink studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-One/Quantego-One-v05.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-One/Quantego-One-v05.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
 
 
 
@@ -73,13 +72,13 @@ Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pd
 
 ### Digital design
 
-The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into [bricklink studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [bricklink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-Two/Quantego-Two.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-Two/Quantego-Two.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
 
 
 
 ## High-end model of IBM Quantum System Two
 
-[Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful model of IBM Quantum System Two made of 1024 bricks.
+[Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful 1024-brick model of IBM Quantum System Two.
 
 <p align="center">
   <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
@@ -87,9 +86,9 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 
 <div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
 
-You can find on the folder [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) other renders of the 1024 bricks model!
+You'll find more renders of the 1024-brick model in the [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) folder.
 
-Here there are some actual photos of the built model, all the others will be posted in the [Photos](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Photos) folder.
+Here are some photos of the built model; more will be posted in the [Photos](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Photos) folder.
 <p align="center">
   <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo1.jpg" alt="Quantego" width="250"/>
   <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo2.jpg" alt="Quantego" width="250"/>
@@ -103,10 +102,10 @@ Parts list can be found at the end of the build instructions file. You can also 
 
 ### Digital design
 
-The digital design file is available [here](Quantego-Two-1024/Quantego-Two-1024_v3_studio.io). This .io file can be imported into [bricklink studio](https://www.bricklink.com/v3/studio/main.page). The model is also available in the open [LDraw format](Quantego-Two-1024/Quantego-Two-1024_v3_studio.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available [here](Quantego-Two-1024/Quantego-Two-1024_v3_studio.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page). The model is also available in the open [LDraw format](Quantego-Two-1024/Quantego-Two-1024_v3_studio.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
 
 ### Disclaimer
-This 1024 parts model has been designed by Lego amateurs (not professional): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
+This 1024-brick model has been designed by LEGO amateurs (not professionals): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
 
 
 ## Compare the models
