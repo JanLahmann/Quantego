@@ -21,7 +21,7 @@ Currently, we feature three different versions: a LEGO model of IBM Quantum Syst
 For each of the models, build instructions and a parts list are provided.
 The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
 
-💡 **The 3D viewers below are interactive.** Drag to rotate and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, 🔗 copies a link to your exact view — and the overlapping **0/1** button hides a small quantum surprise.
+💡 **The 3D viewers below are interactive.** Drag to rotate and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, 🔗 copies a link to your exact view — and on System Two, the overlapping **0/1** button hides a small quantum surprise.
 
 
 ## IBM Quantum System One
@@ -61,6 +61,12 @@ The digital design file is available [here](Quantego-One/Quantego-One-v05.io). T
 
 <div class="viewer" data-model="/assets/models/quantego-two.mpd" data-ar="/assets/models/quantego-two.glb" data-ar-ios="/assets/models/quantego-two.usdz"></div>
 
+### Run a quantum circuit
+
+<div class="qsim"></div>
+
+The real machine runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times. Every run makes the golden *chandelier* inside the cryostat of the model above flash — that is where the qubits live, at 15 millikelvin, and this model lets you look right at them. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
+
 ### Build instructions 
 Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pdf)
 
@@ -85,12 +91,6 @@ The digital design file is available [here](Quantego-Two/Quantego-Two.io). This 
 </p>
 
 <div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
-
-### Run a quantum circuit
-
-The real machine behind this model runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times — one shot per brick of the model above, which pulses with every run. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
-
-<div class="qsim"></div>
 
 You'll find more renders of the 1024-brick model in the [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) folder.
 
@@ -136,7 +136,7 @@ LEGO and BrickLink are trademarks of the LEGO Group. IBM and IBM Quantum are tra
 
 ### Acknowledgments
 
-The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDrawLoader` and `OrbitControls`) and use the [LDraw™ Parts Library](https://www.ldraw.org) (parts geometry is licensed [CC BY](https://www.ldraw.org/article/745.html)). Augmented-reality viewing is powered by [&lt;model-viewer&gt;](https://modelviewer.dev). The models were designed in [BrickLink Studio](https://www.bricklink.com/v3/studio/download.page).
+The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDrawLoader` and `OrbitControls`) and use the [LDraw™ Parts Library](https://www.ldraw.org) (parts geometry is licensed [CC BY](https://www.ldraw.org/article/745.html)). Augmented-reality viewing is powered by [&lt;model-viewer&gt;](https://modelviewer.dev). The quantum circuit simulator is a self-contained statevector simulation that runs entirely in your browser. The models were designed in [BrickLink Studio](https://www.bricklink.com/v3/studio/download.page).
 
 <script type="module" src="/assets/js/ldraw-viewer.js"></script>
 

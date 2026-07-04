@@ -149,7 +149,6 @@ const ANATOMY = {
 // and System Two, ghosted into one image — and measuring collapses to either.
 
 const TWIN = {
-  'quantego-one': { slug: 'quantego-two', self: 'System One', twin: 'System Two' },
   'quantego-two': { slug: 'quantego-one', self: 'System Two', twin: 'System One' },
 };
 
@@ -233,7 +232,7 @@ function createViewer( container, modelUrl ) {
   let stepFlash = null; // { bricks, until } — bricks highlighted for the current step
 
   // Part identification / highlight
-  const highlightMats = new Map(); // original material -> emissive clone
+  const highlightMats = new Map(); // original material -> Map( color -> emissive clone )
   const hlActive = new Map(); // mesh -> { count, orig }: refcounted live highlights
   let flashRestore = null; // pending restore for a click-flash
   let chip = null; // part-info card
@@ -689,16 +688,18 @@ function createViewer( container, modelUrl ) {
   // they are refcounted per mesh: the true original material is captured once,
   // and only the last restore puts it back — a late restore can never
   // resurrect a highlight clone as the "original".
-  function swapHighlight( bricks ) {
+  function swapHighlight( bricks, color = 0x1a7fd4, intensity = 0.65 ) {
     const hl = m => {
       if ( ! m || ! m.isMaterial || ! ( 'emissive' in m ) ) return m;
-      if ( ! highlightMats.has( m ) ) {
+      let byColor = highlightMats.get( m );
+      if ( ! byColor ) { byColor = new Map(); highlightMats.set( m, byColor ); }
+      if ( ! byColor.has( color ) ) {
         const c = m.clone();
-        c.emissive = new THREE.Color( 0x1a7fd4 );
-        c.emissiveIntensity = 0.65;
-        highlightMats.set( m, c );
+        c.emissive = new THREE.Color( color );
+        c.emissiveIntensity = intensity;
+        byColor.set( color, c );
       }
-      return highlightMats.get( m );
+      return byColor.get( color );
     };
     const meshes = [];
     for ( const g of bricks ) {
@@ -1056,22 +1057,40 @@ function createViewer( container, modelUrl ) {
 
   function ghostMaterialSet() {
     // One transparent clone per unique source material, per copy, so the two
-    // states can fade independently during the collapse.
-    const make = () => {
+    // states can fade independently during the collapse. userData.gBase is the
+    // idle ghost opacity the collapse animation interpolates from.
+    const make = base => {
       const map = new Map();
       return m => {
         if ( ! m || ! m.isMaterial ) return m;
         if ( ! map.has( m ) ) {
           const c = m.clone();
           c.transparent = true;
-          c.opacity = 0.42;
+          c.opacity = base;
           c.depthWrite = false;
+          c.userData.gBase = base;
           map.set( m, c );
         }
         return map.get( m );
       };
     };
-    return { a: make(), b: make() };
+    // Brick outline edges are kept as faint lines rather than hidden: light
+    // bricks otherwise wash out against the light background and appear to be
+    // missing from the ghost.
+    const makeEdge = () => {
+      const map = new Map();
+      return m => {
+        if ( ! map.has( m ) ) {
+          const c = m.clone();
+          c.transparent = true;
+          c.opacity = 0.3;
+          c.userData.gBase = 0.3;
+          map.set( m, c );
+        }
+        return map.get( m );
+      };
+    };
+    return { a: make( 0.45 ), b: make( 0.45 ), edgeA: makeEdge(), edgeB: makeEdge() };
   }
 
   let ghostToken = 0; // invalidates a twin model still loading
@@ -1104,7 +1123,15 @@ function createViewer( container, modelUrl ) {
         c.material = Array.isArray( c.material ) ? c.material.map( sets.a ) : sets.a( c.material );
         ( Array.isArray( c.material ) ? c.material : [ c.material ] ).forEach( m => matsA.includes( m ) || matsA.push( m ) );
       } else if ( c.isLineSegments || c.isLine ) {
-        if ( c.visible ) { lines.push( c ); c.visible = false; } // edges kill the ghost look
+        if ( ! c.visible ) return;
+        if ( c.material && c.material.isLineBasicMaterial ) {
+          origByMesh.set( c, c.material ); // faint outline so every brick reads
+          c.material = sets.edgeA( c.material );
+          matsA.includes( c.material ) || matsA.push( c.material );
+        } else {
+          lines.push( c ); // conditional lines stay hidden
+          c.visible = false;
+        }
       }
     } );
 
@@ -1114,7 +1141,12 @@ function createViewer( container, modelUrl ) {
         c.material = Array.isArray( c.material ) ? c.material.map( sets.b ) : sets.b( c.material );
         ( Array.isArray( c.material ) ? c.material : [ c.material ] ).forEach( m => matsB.includes( m ) || matsB.push( m ) );
       } else if ( c.isLineSegments || c.isLine ) {
-        c.visible = false;
+        if ( c.material && c.material.isLineBasicMaterial ) {
+          c.material = sets.edgeB( c.material );
+          matsB.includes( c.material ) || matsB.push( c.material );
+        } else {
+          c.visible = false;
+        }
       }
     } );
     // Both machines stand on the same ground plane.
@@ -1182,8 +1214,8 @@ function createViewer( container, modelUrl ) {
       const t = Math.min( 1, ( now - start ) / dur );
       const keepMats = outcome === 0 ? ghost.matsA : ghost.matsB;
       const dropMats = outcome === 0 ? ghost.matsB : ghost.matsA;
-      for ( const m of keepMats ) m.opacity = 0.42 + ( 1 - 0.42 ) * t;
-      for ( const m of dropMats ) m.opacity = 0.42 * ( 1 - t );
+      for ( const m of keepMats ) m.opacity = m.userData.gBase + ( 1 - m.userData.gBase ) * t;
+      for ( const m of dropMats ) m.opacity = m.userData.gBase * ( 1 - t );
       const keepObj = outcome === 0 ? model : ghost.copy;
       keepObj.rotation.y *= ( 1 - t );
       if ( t >= 1 && ! ghost.done ) {
@@ -1330,18 +1362,39 @@ function createViewer( container, modelUrl ) {
 
     // The quantum simulator sits right below the 1024-brick model and "runs"
     // on it: every run sends a pulse that ripples through these bricks only.
-    if ( slug === 'quantego-two-1024' ) {
+    if ( slug === 'quantego-two' ) {
+      let pulseRestore = null;
       window.addEventListener( 'quantego:pulse', () => {
         container.classList.remove( 'is-pulsing' );
         void container.offsetWidth; // restart the CSS animation
         container.classList.add( 'is-pulsing' );
-        if ( model && ! buildAnim && ! ghost && ! stepMode && ! reduceMotion ) {
-          ensureBrickData();
-          explodeTarget = Math.max( explodeTarget, 0.18 );
-          setTimeout( () => { explodeTarget = exploded ? 1 : 0; }, 420 );
-        }
+        // Flash the golden chandelier hanging inside the cryostat — in the
+        // real machine, that is where the circuit actually runs.
+        if ( ! model || buildAnim || ghost ) return;
+        if ( pulseRestore ) pulseRestore();
+        const restore = swapHighlight( chandelierBricks(), 0xffb100, 0.9 );
+        pulseRestore = restore;
+        setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, 900 );
       } );
     }
+  }
+
+  // The chandelier: the pearl-gold stages and white platters hanging inside
+  // the Cryostat submodel of the System Two model.
+  let chandelier = null;
+  function chandelierBricks() {
+    if ( ! chandelier ) {
+      chandelier = ensureBrickData().filter( g => {
+        let inCryostat = false;
+        for ( let a = g.parent; a && a !== scene; a = a.parent ) {
+          if ( a.name && /cryostat/i.test( a.name ) ) { inCryostat = true; break; }
+        }
+        if ( ! inCryostat ) return false;
+        const code = String( g.userData.colorCode );
+        return code === '297' || code === '15'; // Pearl_Gold and White
+      } );
+    }
+    return chandelier;
   }
 
   // Opens a lightweight overlay with <model-viewer>; on a phone its AR button
