@@ -1,6 +1,6 @@
 # Quantego
 
-## Quantego is a family of LEGO models of IBM quantum computers
+## Quantego is a family of LEGO models of IBM Quantum Computers
 
 <link rel="stylesheet" href="/assets/css/viewer.css">
 <script type="importmap">
@@ -16,12 +16,10 @@ The first version of Quantego was created by Mathilda Lahmann, as mentioned on L
   <img src="First-Quantego.jpg" alt="Quantego" width="300"/>
 </p>
 
-Currently, we feature two different versions: a LEGO model of IBM Quantum System *One* (49 bricks) and one of IBM Quantum System *Two* (105 bricks).
+Currently, we feature three different versions: a LEGO model of IBM Quantum System *One* (49 bricks), a model of IBM Quantum System *Two* (105 bricks), and a much more sophisticated, high-end model of IBM Quantum System Two (1024 bricks).
 
 For each of the models, build instructions and a parts list are provided.
 The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
-
-We also feature a much more sophisticated, 1024-brick model of IBM Quantum System Two — see below.
 
 
 ## IBM Quantum System One
