@@ -249,6 +249,7 @@ function createViewer( container, modelUrl ) {
   // Superposition easter egg
   let ghost = null; // { copy, matsA, matsB, lines, origByMesh, phase, collapsing }
   let psiHint = null;
+  let psiHintTimer = 0; // the hint fades out on its own after a few seconds
 
   const LOOP_DELAY = 3000; // ms to hold the finished model before looping
   let running = false;
@@ -1215,8 +1216,10 @@ function createViewer( container, modelUrl ) {
       psiHint.className = 'viewer-psi-hint';
       container.appendChild( psiHint );
     }
-    psiHint.textContent = `0 and 1 at once: a superposition of ${cfg.self} and ${cfg.twin} — click it to measure.`;
+    psiHint.textContent = '0 and 1 at once — click the model to measure.';
     psiHint.classList.add( 'is-open' );
+    clearTimeout( psiHintTimer );
+    psiHintTimer = setTimeout( () => psiHint.classList.remove( 'is-open' ), 4000 );
   }
 
   function measure() {
