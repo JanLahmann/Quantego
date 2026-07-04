@@ -921,14 +921,33 @@ function createViewer( container, modelUrl ) {
       } );
       const card = document.createElement( 'div' );
       card.className = 'viewer-tourcard';
-      container.append( dotsEl, card );
+      container.appendChild( dotsEl );
+      // The card lives below the viewer, outside the frame, so it never covers
+      // the model. Fullscreen has no "below", so it reparents as an overlay.
+      container.insertAdjacentElement( 'afterend', card );
+      document.addEventListener( 'fullscreenchange', placeTourCard );
       tour = { spots, dotsEl, card, open: false, idx: - 1 };
     }
     tour.open = true;
     tour.dotsEl.style.display = '';
-    container.classList.add( 'is-touring' ); // mobile CSS declutters the frame
+    placeTourCard();
     controls.autoRotate = false;
     openSpot( 0 );
+  }
+
+  // In normal flow the card sits after the viewer element; while the viewer is
+  // fullscreen only its own subtree is visible, so the card moves inside and
+  // floats over the bottom edge instead.
+  function placeTourCard() {
+    if ( ! tour ) return;
+    const fs = document.fullscreenElement === container;
+    if ( fs && tour.card.parentElement !== container ) {
+      container.appendChild( tour.card );
+      tour.card.classList.add( 'is-overlay' );
+    } else if ( ! fs && tour.card.parentElement === container ) {
+      container.insertAdjacentElement( 'afterend', tour.card );
+      tour.card.classList.remove( 'is-overlay' );
+    }
   }
 
   function closeTour() {
@@ -937,7 +956,6 @@ function createViewer( container, modelUrl ) {
     tour.idx = - 1;
     tour.dotsEl.style.display = 'none';
     tour.card.classList.remove( 'is-open' );
-    container.classList.remove( 'is-touring' );
     camTween = null;
     controls.autoRotate = ! reduceMotion && ! stepMode;
   }

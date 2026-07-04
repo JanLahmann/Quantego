@@ -225,25 +225,35 @@
 
 .viewer-hotspot.is-active { background: #0b4f8c; transform: translate(-50%, -50%) scale(1.2); }
 
+/* The explanation card sits in the page flow, directly below the viewer, so
+   it never covers the model. */
 .viewer-tourcard {
-  position: absolute;
-  left: 50%;
-  bottom: 42px;
-  transform: translateX(-50%);
   display: none;
-  width: min(30rem, calc(100% - 24px));
+  max-width: 640px;
+  margin: -0.5rem auto 1rem;
   padding: .6rem .8rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: .82rem;
   color: #1b1f24;
-  background: rgba(255, 255, 255, .95);
+  background: #fcfcfb;
   border: 1px solid #d0d7de;
   border-radius: 10px;
-  box-shadow: 0 3px 14px rgba(27, 31, 36, .16);
 }
 
 .viewer-tourcard.is-open { display: block; }
-.viewer-tourcard p { margin: .3rem 0 .45rem; line-height: 1.35; }
+.viewer-tourcard p { margin: .3rem 0 .45rem; line-height: 1.35; min-height: 2.7em; }
+
+/* Fullscreen has no "below the viewer": the card floats over the bottom edge. */
+.viewer-tourcard.is-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 42px;
+  transform: translateX(-50%);
+  width: min(30rem, calc(100% - 24px));
+  margin: 0;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 3px 14px rgba(27, 31, 36, .16);
+}
 
 .viewer-tourcard-nav { display: flex; justify-content: flex-end; gap: 6px; }
 .viewer-tourcard-nav .viewer-btn { padding: .15rem .55rem; font-size: .85rem; }
@@ -365,25 +375,6 @@
 @media (max-width: 600px) {
   .viewer { aspect-ratio: 4 / 3; }
   .viewer-status { max-width: 45%; } /* keep the scrubber usable next to it */
-
-  /* Keep the tour card from covering the model on small screens: compact
-     type, capped height, and scroll inside the card if the text runs long. */
-  .viewer-tourcard {
-    max-height: 44%;
-    overflow-y: auto;
-    padding: .45rem .6rem;
-    font-size: .74rem;
-  }
-  .viewer-tourcard p { margin: .2rem 0 .35rem; line-height: 1.3; }
-  .viewer-tourcard-nav .viewer-btn { padding: .1rem .5rem; }
-
-  /* While the tour is open, clear everything else out of the small frame so
-     the model stays visible: only the hotspot dots and the card remain (the
-     card's ✕ ends the tour and brings the buttons back). */
-  .viewer.is-touring .viewer-controls,
-  .viewer.is-touring .viewer-extras,
-  .viewer.is-touring .viewer-transport { display: none; }
-  .viewer.is-touring .viewer-tourcard { bottom: 8px; }
 }
 
 /* ------------------------------------------------------------------------- */
