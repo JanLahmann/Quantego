@@ -65,7 +65,7 @@ The digital design file is available [here](Quantego-One/Quantego-One-v05.io). T
 
 <div class="qsim"></div>
 
-The real machine runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times. Every run makes the golden *chandelier* inside the cryostat of the model above flash — that is where the qubits live, at 15 millikelvin, and this model lets you look right at them. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
+The real machine runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times. Every run makes the golden *chandelier* inside the cryostat of the model above flash — that is where the qubits live, at 15 millikelvin, and this model lets you look right at them. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure. Prefer it simpler? Switch the simulator down to one or two qubits.
 
 ### Build instructions 
 Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pdf)
