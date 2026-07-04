@@ -438,6 +438,13 @@
 .qsim-tool:hover, .qsim-preset:hover, .qsim-run:hover { background: #f2f6fa; }
 .qsim-tool.is-active { background: #dbeafe; border-color: #1a7fd4; }
 
+/* Choices that need more qubits than selected (CNOT on 1 qubit, GHZ on 2…). */
+.qsim-tool:disabled, .qsim-preset:disabled {
+  opacity: .4;
+  cursor: default;
+  background: #fff;
+}
+
 .qsim-grid { margin: .8rem 0 .3rem; }
 
 /* Helper line under the grid: gate explanations + the CNOT placement prompt. */

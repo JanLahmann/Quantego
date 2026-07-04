@@ -1,18 +1,17 @@
-// A tiny quantum circuit composer + simulator (3 qubits, H/X/Z/CNOT), used by
-// the "Run a quantum circuit" section. Everything runs locally in the browser:
-// the circuit is simulated exactly on an 8-amplitude state vector, then sampled
-// for 1024 shots — one per brick of the high-end model. Every run dispatches a
-// 'quantego:pulse' event that the 3D viewers on the page react to.
+// A tiny quantum circuit composer + simulator (1-3 qubits, H/X/Z/CNOT), used
+// by the "Run a quantum circuit" section. Everything runs locally in the
+// browser: the circuit is simulated exactly on a 2^n-amplitude state vector,
+// then sampled for 1024 shots — one per brick of the high-end model. Every run
+// dispatches a 'quantego:pulse' event that the 3D viewers on the page react to.
 //
 // H, X, Z and CNOT all have real-valued matrices, so amplitudes stay real and
-// the state fits in one Float64Array(8). Qubit i is bit i of the state index;
-// ket labels are little-endian as on IBM Quantum / Qiskit: |q2 q1 q0⟩, so the
-// top wire q0 is the rightmost bit.
+// the state fits in one small Float64Array. Qubit i is bit i of the state
+// index; ket labels are little-endian as on IBM Quantum / Qiskit: |q2 q1 q0⟩,
+// so the top wire q0 is the rightmost bit.
 
-const QUBITS = 3;
+const MAX_QUBITS = 3;
 const COLS = 6;
 const SHOTS = 1024;
-const DIM = 1 << QUBITS;
 
 const GATES = {
   H: { m: [ 1 / Math.SQRT2, 1 / Math.SQRT2, 1 / Math.SQRT2, - 1 / Math.SQRT2 ], hint: 'Hadamard — puts a qubit into an equal superposition of 0 and 1' },
@@ -22,15 +21,16 @@ const GATES = {
 };
 
 // Preset circuits: singles are { g, q, col }, CNOTs are { g: 'CX', c, t, col }.
+// min is the smallest qubit count the preset fits on.
 const PRESETS = {
-  'Coin flip': [ { g: 'H', q: 0, col: 0 } ],
-  'Bell pair': [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 } ],
-  'GHZ state': [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 }, { g: 'CX', c: 1, t: 2, col: 2 } ],
+  'Coin flip': { min: 1, ops: [ { g: 'H', q: 0, col: 0 } ] },
+  'Bell pair': { min: 2, ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 } ] },
+  'GHZ state': { min: 3, ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 }, { g: 'CX', c: 1, t: 2, col: 2 } ] },
 };
 
 function applySingle( state, m, q ) {
   const bit = 1 << q;
-  for ( let k = 0; k < DIM; k ++ ) {
+  for ( let k = 0; k < state.length; k ++ ) {
     if ( k & bit ) continue;
     const a = state[ k ], b = state[ k | bit ];
     state[ k ] = m[ 0 ] * a + m[ 1 ] * b;
@@ -40,7 +40,7 @@ function applySingle( state, m, q ) {
 
 function applyCX( state, c, t ) {
   const cb = 1 << c, tb = 1 << t;
-  for ( let k = 0; k < DIM; k ++ ) {
+  for ( let k = 0; k < state.length; k ++ ) {
     if ( ( k & cb ) && ! ( k & tb ) ) {
       const j = k | tb;
       const tmp = state[ k ];
@@ -53,12 +53,12 @@ function applyCX( state, c, t ) {
 // circuit[q][col] holds 'H' | 'X' | 'Z' | null for single-qubit gates, or the
 // pieces of a CNOT: 'CX' (control), 'CXT' (target), 'CXL' (a wire the CNOT's
 // connector line crosses — kept occupied so nothing else lands under the line).
-function simulate( circuit ) {
-  const state = new Float64Array( DIM );
+function simulate( circuit, qubits ) {
+  const state = new Float64Array( 1 << qubits );
   state[ 0 ] = 1;
   for ( let col = 0; col < COLS; col ++ ) {
     let c = - 1, t = - 1;
-    for ( let q = 0; q < QUBITS; q ++ ) {
+    for ( let q = 0; q < qubits; q ++ ) {
       const cell = circuit[ q ][ col ];
       if ( cell === 'CX' ) c = q;
       else if ( cell === 'CXT' ) t = q;
@@ -71,19 +71,19 @@ function simulate( circuit ) {
 
 function sample( state ) {
   const probs = [ ...state ].map( a => a * a );
-  const counts = new Array( DIM ).fill( 0 );
+  const counts = new Array( state.length ).fill( 0 );
   for ( let s = 0; s < SHOTS; s ++ ) {
     let r = Math.random(), k = 0;
-    while ( k < DIM - 1 && r >= probs[ k ] ) { r -= probs[ k ]; k ++; }
+    while ( k < counts.length - 1 && r >= probs[ k ] ) { r -= probs[ k ]; k ++; }
     counts[ k ] ++;
   }
   return counts;
 }
 
 // Little-endian ket label: highest qubit first, q0 as the rightmost bit.
-function ket( k ) {
+function ket( k, qubits ) {
   let s = '';
-  for ( let q = QUBITS - 1; q >= 0; q -- ) s += ( k >> q ) & 1;
+  for ( let q = qubits - 1; q >= 0; q -- ) s += ( k >> q ) & 1;
   return s;
 }
 
@@ -105,12 +105,23 @@ function btn( cls, text, onClick ) {
 }
 
 function createSim( container ) {
-  const circuit = Array.from( { length: QUBITS }, () => new Array( COLS ).fill( null ) );
+  let qubits = MAX_QUBITS;
+  let circuit = [];
+  let cells = []; // cells[q][col] -> button
   let tool = 'H';
   let pending = null; // { q, col } — a CNOT control waiting for its target
-  const cells = []; // cells[q][col] -> button
 
-  // --- toolbar: gate palette + presets -------------------------------------
+  // --- toolbar: qubit count + gate palette + presets -------------------------
+  const qubitRow = el( 'div', 'qsim-row' );
+  qubitRow.appendChild( el( 'span', 'qsim-rowlabel', 'Qubits' ) );
+  const qubitBtns = {};
+  for ( let n = 1; n <= MAX_QUBITS; n ++ ) {
+    const b = btn( 'qsim-tool qsim-qubit', String( n ), () => setQubits( n ) );
+    b.title = `Use ${n} qubit${n > 1 ? 's' : ''}`;
+    qubitBtns[ n ] = b;
+    qubitRow.appendChild( b );
+  }
+
   const palette = el( 'div', 'qsim-row' );
   palette.appendChild( el( 'span', 'qsim-rowlabel', 'Gates' ) );
   const toolBtns = {};
@@ -127,8 +138,11 @@ function createSim( container ) {
 
   const presets = el( 'div', 'qsim-row' );
   presets.appendChild( el( 'span', 'qsim-rowlabel', 'Presets' ) );
-  for ( const [ name, ops ] of Object.entries( PRESETS ) ) {
-    presets.appendChild( btn( 'qsim-preset', name, () => loadPreset( ops ) ) );
+  const presetBtns = {};
+  for ( const [ name, p ] of Object.entries( PRESETS ) ) {
+    const b = btn( 'qsim-preset', name, () => loadPreset( p.ops ) );
+    presetBtns[ name ] = b;
+    presets.appendChild( b );
   }
   presets.appendChild( btn( 'qsim-preset', 'Clear', () => loadPreset( [] ) ) );
 
@@ -142,17 +156,36 @@ function createSim( container ) {
   // --- circuit grid ---------------------------------------------------------
   const grid = el( 'div', 'qsim-grid' );
   grid.setAttribute( 'role', 'grid' );
-  for ( let q = 0; q < QUBITS; q ++ ) {
-    const row = el( 'div', 'qsim-wire' );
-    row.appendChild( el( 'span', 'qsim-wirelabel', wireName( q ) ) );
-    cells[ q ] = [];
-    for ( let col = 0; col < COLS; col ++ ) {
-      const c = btn( 'qsim-cell', '', () => onCell( q, col ) );
-      c.setAttribute( 'aria-label', `qubit ${q}, column ${col + 1}` );
-      cells[ q ][ col ] = c;
-      row.appendChild( c );
+
+  function buildGrid() {
+    grid.innerHTML = '';
+    cells = [];
+    circuit = Array.from( { length: qubits }, () => new Array( COLS ).fill( null ) );
+    for ( let q = 0; q < qubits; q ++ ) {
+      const row = el( 'div', 'qsim-wire' );
+      row.appendChild( el( 'span', 'qsim-wirelabel', wireName( q ) ) );
+      cells[ q ] = [];
+      for ( let col = 0; col < COLS; col ++ ) {
+        const c = btn( 'qsim-cell', '', () => onCell( q, col ) );
+        c.setAttribute( 'aria-label', `qubit ${q}, column ${col + 1}` );
+        cells[ q ][ col ] = c;
+        row.appendChild( c );
+      }
+      grid.appendChild( row );
     }
-    grid.appendChild( row );
+  }
+
+  function setQubits( n ) {
+    qubits = n;
+    pending = null;
+    for ( const [ k, b ] of Object.entries( qubitBtns ) ) b.classList.toggle( 'is-active', + k === n );
+    buildGrid();
+    // A CNOT needs two wires; presets need at least their min qubit count.
+    toolBtns.CX.disabled = n < 2;
+    if ( n < 2 && tool === 'CX' ) { setTool( 'H' ); }
+    for ( const [ name, p ] of Object.entries( PRESETS ) ) presetBtns[ name ].disabled = p.min > n;
+    results.innerHTML = '';
+    loadPreset( ( n === 1 ? PRESETS[ 'Coin flip' ] : PRESETS[ 'Bell pair' ] ).ops );
   }
 
   // One-line helper text under the grid; doubles as the CNOT placement prompt
@@ -164,7 +197,7 @@ function createSim( container ) {
   function clearCell( q, col ) {
     const v = circuit[ q ][ col ];
     if ( v === 'CX' || v === 'CXT' || v === 'CXL' ) {
-      for ( let i = 0; i < QUBITS; i ++ ) {
+      for ( let i = 0; i < qubits; i ++ ) {
         const w = circuit[ i ][ col ];
         if ( w === 'CX' || w === 'CXT' || w === 'CXL' ) circuit[ i ][ col ] = null;
       }
@@ -176,7 +209,7 @@ function createSim( container ) {
   function placeCX( c, t, col ) {
     // A column holds at most one CNOT: drop any existing one, then claim the
     // whole control-to-target span (overwriting any single gates on the way).
-    for ( let i = 0; i < QUBITS; i ++ ) {
+    for ( let i = 0; i < qubits; i ++ ) {
       const w = circuit[ i ][ col ];
       if ( w === 'CX' || w === 'CXT' || w === 'CXL' ) circuit[ i ][ col ] = null;
     }
@@ -214,7 +247,7 @@ function createSim( container ) {
 
   function loadPreset( ops ) {
     pending = null;
-    for ( let q = 0; q < QUBITS; q ++ ) circuit[ q ].fill( null );
+    for ( let q = 0; q < qubits; q ++ ) circuit[ q ].fill( null );
     for ( const op of ops ) {
       if ( op.g === 'CX' ) placeCX( op.c, op.t, op.col );
       else circuit[ op.q ][ op.col ] = op.g;
@@ -233,14 +266,15 @@ function createSim( container ) {
   }
 
   function paint() {
+    if ( ! cells.length ) return; // grid not built yet
     for ( let col = 0; col < COLS; col ++ ) {
       let c = - 1, t = - 1;
-      for ( let q = 0; q < QUBITS; q ++ ) {
+      for ( let q = 0; q < qubits; q ++ ) {
         if ( circuit[ q ][ col ] === 'CX' ) c = q;
         else if ( circuit[ q ][ col ] === 'CXT' ) t = q;
       }
       const lo = Math.min( c, t ), hi = Math.max( c, t );
-      for ( let q = 0; q < QUBITS; q ++ ) {
+      for ( let q = 0; q < qubits; q ++ ) {
         const v = circuit[ q ][ col ];
         const cell = cells[ q ][ col ];
         const isPend = pending && pending.q === q && pending.col === col;
@@ -260,7 +294,7 @@ function createSim( container ) {
 
   // --- run + histogram -------------------------------------------------------
   const run = btn( 'qsim-run', `▶ Run ${SHOTS} shots`, () => {
-    const counts = sample( simulate( circuit ) );
+    const counts = sample( simulate( circuit, qubits ) );
     renderResults( counts );
     // Local feedback (the panel itself glows) plus the page-wide pulse the
     // 3D viewers react to.
@@ -269,7 +303,7 @@ function createSim( container ) {
     container.classList.add( 'is-pulsing' );
     window.dispatchEvent( new CustomEvent( 'quantego:pulse' ) );
   } );
-  run.title = `Simulate the circuit and measure all ${QUBITS} qubits, ${SHOTS} times`;
+  run.title = `Simulate the circuit and measure all qubits, ${SHOTS} times`;
 
   const results = el( 'div', 'qsim-results' );
 
@@ -280,8 +314,8 @@ function createSim( container ) {
     counts.forEach( ( n, k ) => {
       const row = el( 'div', 'qsim-bar-row' );
       const pct = ( n / SHOTS * 100 ).toFixed( 1 );
-      row.title = `|${ket( k )}⟩: ${n} of ${SHOTS} shots (${pct}%)`;
-      row.appendChild( el( 'span', 'qsim-bar-ket', `|${ket( k )}⟩` ) );
+      row.title = `|${ket( k, qubits )}⟩: ${n} of ${SHOTS} shots (${pct}%)`;
+      row.appendChild( el( 'span', 'qsim-bar-ket', `|${ket( k, qubits )}⟩` ) );
       const track = el( 'div', 'qsim-bar-track' );
       const bar = el( 'div', 'qsim-bar' );
       bar.style.width = ( n / max * 100 ) + '%';
@@ -290,13 +324,17 @@ function createSim( container ) {
       row.appendChild( el( 'span', 'qsim-bar-count', String( n ) ) );
       results.appendChild( row );
     } );
-    results.appendChild( el( 'div', 'qsim-note', `Kets are little-endian, as on IBM Quantum: |${wireName( 2 )}${wireName( 1 )}${wireName( 0 )}⟩ — the top wire ${wireName( 0 )} is the rightmost bit.` ) );
+    if ( qubits > 1 ) {
+      let names = '';
+      for ( let q = qubits - 1; q >= 0; q -- ) names += wireName( q );
+      results.appendChild( el( 'div', 'qsim-note', `Kets are little-endian, as on IBM Quantum: |${names}⟩ — the top wire ${wireName( 0 )} is the rightmost bit.` ) );
+    }
     results.appendChild( el( 'div', 'qsim-note', 'Simulated locally in your browser. Each run also flashes the golden chandelier inside the cryostat above — in the real machine, that is where the qubits live.' ) );
   }
 
-  container.append( palette, presets, grid, hint, run, results );
+  container.append( qubitRow, palette, presets, grid, hint, run, results );
+  setQubits( MAX_QUBITS );
   setTool( 'H' );
-  loadPreset( PRESETS[ 'Bell pair' ] );
 }
 
 export function initAll() {
