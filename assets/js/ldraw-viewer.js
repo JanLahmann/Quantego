@@ -681,13 +681,43 @@ function createViewer( container, modelUrl ) {
 
   // ------------------------------------------------- part identification
 
-  // Swaps the mesh materials of the given bricks for an emissive-tinted clone;
-  // returns a function that restores the originals. Clones are cached per
-  // source material, so repeated highlights are cheap. Highlights overlap
-  // (step flash + click flash + parts selection can hit the same brick), so
-  // they are refcounted per mesh: the true original material is captured once,
-  // and only the last restore puts it back — a late restore can never
-  // resurrect a highlight clone as the "original".
+  // Core temporary-material swapper behind highlights and dims; returns a
+  // function that restores the originals. Effects overlap (step flash + click
+  // flash + parts selection + chandelier reveal can hit the same brick), so
+  // they are refcounted per object: the true original material is captured
+  // once, and only the last restore puts it back — a late restore can never
+  // resurrect a temporary material as the "original".
+  function swapMaterials( bricks, mapMat, includeLines = false ) {
+    const objs = [];
+    for ( const g of bricks ) {
+      for ( const c of g.children ) {
+        const isEdge = ( c.isLineSegments || c.isLine ) && c.material && c.material.isLineBasicMaterial;
+        if ( ! c.isMesh && ! ( includeLines && isEdge ) ) continue;
+        let entry = hlActive.get( c );
+        if ( ! entry ) {
+          entry = { count: 0, orig: c.material };
+          hlActive.set( c, entry );
+          c.material = Array.isArray( entry.orig ) ? entry.orig.map( mapMat ) : mapMat( entry.orig );
+        }
+        entry.count ++;
+        objs.push( c );
+      }
+    }
+    let restored = false;
+    return () => {
+      if ( restored ) return;
+      restored = true;
+      for ( const c of objs ) {
+        const entry = hlActive.get( c );
+        if ( entry && -- entry.count <= 0 ) {
+          c.material = entry.orig;
+          hlActive.delete( c );
+        }
+      }
+    };
+  }
+
+  // Emissive-tinted highlight; clones are cached per source material + colour.
   function swapHighlight( bricks, color = 0x1a7fd4, intensity = 0.65 ) {
     const hl = m => {
       if ( ! m || ! m.isMaterial || ! ( 'emissive' in m ) ) return m;
@@ -701,32 +731,25 @@ function createViewer( container, modelUrl ) {
       }
       return byColor.get( color );
     };
-    const meshes = [];
-    for ( const g of bricks ) {
-      for ( const c of g.children ) {
-        if ( ! c.isMesh ) continue;
-        let entry = hlActive.get( c );
-        if ( ! entry ) {
-          entry = { count: 0, orig: c.material };
-          hlActive.set( c, entry );
-          c.material = Array.isArray( entry.orig ) ? entry.orig.map( hl ) : hl( entry.orig );
-        }
-        entry.count ++;
-        meshes.push( c );
+    return swapMaterials( bricks, hl );
+  }
+
+  // Fades bricks (surfaces and outline edges) to near-transparent — used to
+  // look through the model at the chandelier during a circuit run.
+  const dimMats = new Map(); // material -> faded clone
+  function swapDim( bricks ) {
+    const dim = m => {
+      if ( ! m || ! m.isMaterial ) return m;
+      if ( ! dimMats.has( m ) ) {
+        const c = m.clone();
+        c.transparent = true;
+        c.opacity = m.isLineBasicMaterial ? 0.1 : 0.15;
+        c.depthWrite = false;
+        dimMats.set( m, c );
       }
-    }
-    let restored = false;
-    return () => {
-      if ( restored ) return;
-      restored = true;
-      for ( const c of meshes ) {
-        const entry = hlActive.get( c );
-        if ( entry && -- entry.count <= 0 ) {
-          c.material = entry.orig;
-          hlActive.delete( c );
-        }
-      }
+      return dimMats.get( m );
     };
+    return swapMaterials( bricks, dim, true );
   }
 
   // Undoes every live highlight (step flash, click flash, parts selection) so
@@ -760,7 +783,15 @@ function createViewer( container, modelUrl ) {
     // so effective visibility means checking the whole ancestor chain.
     const shown = o => { for ( let n = o; n; n = n.parent ) if ( ! n.visible ) return false; return true; };
     const hit = ray.intersectObject( model, true ).find( i => i.object.isMesh && shown( i.object ) );
-    if ( ! hit ) { hideChip(); return; }
+    if ( ! hit ) {
+      hideChip();
+      // A click on the empty background pauses or resumes the idle spin.
+      if ( ! buildAnim && ! stepMode && ! ( tour && tour.open ) ) {
+        controls.autoRotate = ! controls.autoRotate;
+        toast( controls.autoRotate ? 'Rotation resumed.' : 'Rotation paused — click the background to restart it.' );
+      }
+      return;
+    }
 
     const brick = brickOf( hit.object );
     if ( ! brick ) return;
@@ -1135,17 +1166,24 @@ function createViewer( container, modelUrl ) {
       }
     } );
 
+    // The clone's real materials are remembered so the copy can turn solid if
+    // the measurement collapses to the twin.
     const copy = twin.clone( true );
+    const copyOrig = new Map();
+    const copyHidden = [];
     copy.traverse( c => {
       if ( c.isMesh ) {
+        copyOrig.set( c, c.material );
         c.material = Array.isArray( c.material ) ? c.material.map( sets.b ) : sets.b( c.material );
         ( Array.isArray( c.material ) ? c.material : [ c.material ] ).forEach( m => matsB.includes( m ) || matsB.push( m ) );
       } else if ( c.isLineSegments || c.isLine ) {
         if ( c.material && c.material.isLineBasicMaterial ) {
+          copyOrig.set( c, c.material );
           c.material = sets.edgeB( c.material );
           matsB.includes( c.material ) || matsB.push( c.material );
         } else {
           c.visible = false;
+          copyHidden.push( c );
         }
       }
     } );
@@ -1154,7 +1192,7 @@ function createViewer( container, modelUrl ) {
     scene.add( copy );
 
     ghost = {
-      copy, matsA, matsB, lines, origByMesh,
+      copy, copyOrig, copyHidden, matsA, matsB, lines, origByMesh,
       start: performance.now(), collapsing: null, done: false, timer: 0,
       nameA: cfg.self, nameB: cfg.twin,
     };
@@ -1219,12 +1257,22 @@ function createViewer( container, modelUrl ) {
       const keepObj = outcome === 0 ? model : ghost.copy;
       keepObj.rotation.y *= ( 1 - t );
       if ( t >= 1 && ! ghost.done ) {
-        // Hold the survivor on screen for a beat, then quietly restore the
-        // section's own model.
+        // The fade runs on ghost materials (transparent, no depth writes),
+        // which look x-ray-ish at full opacity — so the survivor snaps back
+        // to its real solid materials the moment the collapse completes.
         ghost.done = true;
-        if ( outcome === 1 ) model.visible = false;
         toast( `Measured: |${outcome}⟩ — it collapsed to ${outcome === 0 ? ghost.nameA : ghost.nameB}.` );
-        ghost.timer = setTimeout( () => collapseGhost( true ), 2800 );
+        if ( outcome === 0 ) {
+          collapseGhost( true ); // the survivor IS the section's own model
+        } else {
+          // The twin survived: show it solid for a beat, then quietly bring
+          // the section's own model back.
+          model.visible = false;
+          for ( const [ o, m ] of ghost.copyOrig ) o.material = m;
+          for ( const l of ghost.copyHidden ) l.visible = true;
+          ghost.copy.rotation.y = 0;
+          ghost.timer = setTimeout( () => collapseGhost( true ), 2800 );
+        }
       }
       return;
     }
@@ -1368,13 +1416,19 @@ function createViewer( container, modelUrl ) {
         container.classList.remove( 'is-pulsing' );
         void container.offsetWidth; // restart the CSS animation
         container.classList.add( 'is-pulsing' );
-        // Flash the golden chandelier hanging inside the cryostat — in the
-        // real machine, that is where the circuit actually runs.
-        if ( ! model || buildAnim || ghost ) return;
+        // Look inside the cryostat: everything else fades to near-transparent
+        // while the golden chandelier lights up amber — in the real machine,
+        // that is where the circuit actually runs.
+        if ( ! model || buildAnim || ghost || stepMode ) return;
         if ( pulseRestore ) pulseRestore();
-        const restore = swapHighlight( chandelierBricks(), 0xffb100, 0.9 );
+        const chan = chandelierBricks();
+        const chanSet = new Set( chan );
+        const rest = ensureBrickData().filter( g => ! chanSet.has( g ) );
+        const glow = swapHighlight( chan, 0xffb100, 1.2 );
+        const fade = swapDim( rest );
+        const restore = () => { glow(); fade(); };
         pulseRestore = restore;
-        setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, 900 );
+        setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, 1400 );
       } );
     }
   }
@@ -1755,6 +1809,17 @@ function createCompareViewer( container, urls ) {
     scrubber.addEventListener( 'change', onScrubRelease );
     transport.append( playBtn, scrubber );
     container.appendChild( transport );
+
+    // A click (not a drag) pauses or resumes the idle spin.
+    let downAt = null;
+    renderer.domElement.addEventListener( 'pointerdown', e => { downAt = { x: e.clientX, y: e.clientY }; } );
+    renderer.domElement.addEventListener( 'pointerup', e => {
+      if ( ! downAt ) return;
+      const moved = Math.hypot( e.clientX - downAt.x, e.clientY - downAt.y );
+      downAt = null;
+      if ( moved > 7 || buildAnim ) return;
+      controls.autoRotate = ! controls.autoRotate;
+    } );
   }
 
   function renderLoop() {
