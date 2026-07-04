@@ -225,25 +225,35 @@
 
 .viewer-hotspot.is-active { background: #0b4f8c; transform: translate(-50%, -50%) scale(1.2); }
 
+/* The explanation card sits in the page flow, directly below the viewer, so
+   it never covers the model. */
 .viewer-tourcard {
-  position: absolute;
-  left: 50%;
-  bottom: 42px;
-  transform: translateX(-50%);
   display: none;
-  width: min(30rem, calc(100% - 24px));
+  max-width: 640px;
+  margin: -0.5rem auto 1rem;
   padding: .6rem .8rem;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: .82rem;
   color: #1b1f24;
-  background: rgba(255, 255, 255, .95);
+  background: #fcfcfb;
   border: 1px solid #d0d7de;
   border-radius: 10px;
-  box-shadow: 0 3px 14px rgba(27, 31, 36, .16);
 }
 
 .viewer-tourcard.is-open { display: block; }
-.viewer-tourcard p { margin: .3rem 0 .45rem; line-height: 1.35; }
+.viewer-tourcard p { margin: .3rem 0 .45rem; line-height: 1.35; min-height: 2.7em; }
+
+/* Fullscreen has no "below the viewer": the card floats over the bottom edge. */
+.viewer-tourcard.is-overlay {
+  position: absolute;
+  left: 50%;
+  bottom: 42px;
+  transform: translateX(-50%);
+  width: min(30rem, calc(100% - 24px));
+  margin: 0;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 3px 14px rgba(27, 31, 36, .16);
+}
 
 .viewer-tourcard-nav { display: flex; justify-content: flex-end; gap: 6px; }
 .viewer-tourcard-nav .viewer-btn { padding: .15rem .55rem; font-size: .85rem; }
@@ -286,8 +296,10 @@
 
 .viewer-toast.is-open { opacity: 1; transform: translate(-50%, 0); }
 
-/* The circuit simulator "runs" on the models: a brief glow ripples the page. */
-.viewer.is-pulsing, .viewer-compare.is-pulsing {
+/* The circuit simulator "runs" on the models: a brief glow ripples the page.
+   The simulator panel itself glows too, so the run is felt even when no 3D
+   viewer is on screen. */
+.viewer.is-pulsing, .viewer-compare.is-pulsing, .qsim.is-pulsing {
   animation: viewer-pulse 1.1s ease-out;
 }
 
@@ -407,7 +419,15 @@
 .qsim-tool:hover, .qsim-preset:hover, .qsim-run:hover { background: #f2f6fa; }
 .qsim-tool.is-active { background: #dbeafe; border-color: #1a7fd4; }
 
-.qsim-grid { margin: .8rem 0; }
+.qsim-grid { margin: .8rem 0 .3rem; }
+
+/* Helper line under the grid: gate explanations + the CNOT placement prompt. */
+.qsim-hint {
+  min-height: 1.1em;
+  margin: 0 0 .7rem;
+  font-size: .74rem;
+  color: #57606a;
+}
 
 .qsim-wire {
   display: flex;
@@ -445,9 +465,11 @@
   border: 1.5px solid #1a7fd4;
 }
 
-/* CNOT: the control dot links down to its ⊕ target on the wire below. */
-.qsim-cell.is-cx-control::after,
-.qsim-cell.is-cx-target::before {
+/* CNOT connector: each cell in the control-to-target span draws its share of
+   the vertical line (down toward the far end, up toward the near end), so the
+   control can sit above or below the target and even span the middle wire. */
+.qsim-cell.cx-down::after,
+.qsim-cell.cx-up::before {
   content: "";
   position: absolute;
   left: 50%;
@@ -456,9 +478,16 @@
   background: #1a7fd4;
 }
 
-.qsim-cell.is-cx-control::after { top: 50%; bottom: -3px; }
-.qsim-cell.is-cx-target::before { top: -3px; bottom: 50%; }
+.qsim-cell.cx-down::after { top: 50%; bottom: -3px; }
+.qsim-cell.cx-up::before { top: -3px; bottom: 50%; }
 .qsim-cell.is-cx-target { color: #1a7fd4; }
+
+/* A CNOT control waiting for its target to be clicked. */
+.qsim-cell.is-cx-pending {
+  color: #1a7fd4;
+  background-color: #fff;
+  border: 1.5px dashed #1a7fd4;
+}
 
 .qsim-run {
   padding: .45rem .9rem;

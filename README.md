@@ -117,7 +117,7 @@ All three models shown side by side at the same physical scale. Drag to rotate, 
 
 ## Run a quantum circuit
 
-The real machines behind these models run *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** (●–⊕) to entangle it with the next one, and press run: the circuit is simulated right in your browser and measured 1024 times (one shot per brick of the high-end model). Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
+The real machines behind these models run *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times (one shot per brick of the high-end model). Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure.
 
 <div class="qsim"></div>
 
