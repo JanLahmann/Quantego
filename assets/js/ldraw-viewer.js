@@ -124,7 +124,10 @@ const pendingShare = parseShareHash();
 // ancestor chain, so alias parts count), both filters combine, and `pick`
 // narrows the match to one region ('side' = outermost brick, 'top'/'bottom' =
 // highest/lowest brick, 'mid' = the middle height band). `at` (normalised
-// bounding-box coordinates) is only a last-resort fallback.
+// bounding-box coordinates) is only a last-resort fallback. Stops marked
+// `reveal: true` sit deep inside the model: while such a stop is open, every
+// brick that is not part of it fades to near-transparent, so the component
+// shows through the bricks that are in the way.
 
 const ANATOMY = {
   'quantego-one': [
@@ -141,9 +144,12 @@ const ANATOMY = {
   ],
   'quantego-two-1024': [
     { title: 'Base and floor', group: 'base', at: [ 0.5, 0.05, 0.5 ], body: 'The raised floor hides cabling, cooling and vibration isolation — in the real machine room, much of the engineering is invisible from above.' },
-    { title: 'Cryogenic chandelier', group: 'chandelier', at: [ 0.5, 0.55, 0.5 ], body: 'Inside the cryostat hangs the "chandelier": gold-plated stages, each roughly ten times colder than the one above, stepping down from room temperature to ~15 millikelvin at the quantum chip.' },
+    { title: 'Glass shell', color: [ '47' ], pick: 'side', at: [ 0.9, 0.6, 0.5 ], body: 'Like System One before it, the machine shows itself off: the enclosure is transparent, turning the computer into an exhibit.' },
+    { title: 'Cryogenic chandelier', group: 'chandelier', reveal: true, at: [ 0.5, 0.55, 0.5 ], body: 'Inside the cryostat hangs the "chandelier": gold-plated stages, each roughly ten times colder than the one above, stepping down from room temperature to ~15 millikelvin at the quantum chip.' },
+    { title: 'Cryogenic rack', group: 'cryo rack', reveal: true, at: [ 0.4, 0.4, 0.5 ], body: 'Next to the chandelier stands the cryogenic rack: the pumps, valves and helium plumbing that keep the dilution refrigerator cold around the clock.' },
+    { title: 'Server rack', group: 'server rack', reveal: true, at: [ 0.6, 0.4, 0.5 ], body: 'Quantum computers are hybrids: a rack of classical servers prepares every circuit that runs and collects every shot that is measured.' },
+    { title: 'Cabling', group: 'rope', reveal: true, at: [ 0.5, 0.6, 0.5 ], body: 'Flexible lines snake down into the machine — microwave coax to control and read out every qubit, and the plumbing of the helium circuit.' },
     { title: 'Service wings', group: 'wing', at: [ 0.15, 0.5, 0.5 ], body: 'The wings give technicians access to wiring and cryogenics — and the modular design means future System Twos can dock additional units.' },
-    { title: 'Glass shell', group: 'glass', at: [ 0.9, 0.6, 0.5 ], body: 'Like System One before it, the machine shows itself off: the enclosure is transparent, turning the computer into an exhibit.' },
   ],
 };
 
@@ -739,21 +745,40 @@ function createViewer( container, modelUrl ) {
   }
 
   // Fades bricks (surfaces and outline edges) to near-transparent — used to
-  // look through the model at the chandelier during a circuit run.
+  // look through the model at the chandelier during a circuit run and at the
+  // tour's interior stops.
   const dimMats = new Map(); // material -> faded clone
   function swapDim( bricks ) {
     const dim = m => {
       if ( ! m || ! m.isMaterial ) return m;
       if ( ! dimMats.has( m ) ) {
         const c = m.clone();
+        // Edges almost vanish: on the 1024-brick model, a thousand faint
+        // outlines would otherwise still add up to a grey haze.
         c.transparent = true;
-        c.opacity = m.isLineBasicMaterial ? 0.1 : 0.15;
+        c.opacity = m.isLineBasicMaterial ? 0.03 : 0.09;
         c.depthWrite = false;
         dimMats.set( m, c );
       }
       return dimMats.get( m );
     };
-    return swapMaterials( bricks, dim, true );
+    const restoreMats = swapMaterials( bricks, dim, true );
+    // Conditional edge lines use a shader material that ignores the swap;
+    // thousands of them read as dark noise, so they hide outright.
+    const hidden = [];
+    for ( const g of bricks ) {
+      for ( const c of g.children ) {
+        if ( ( c.isLineSegments || c.isLine ) && c.visible &&
+             ! ( c.material && c.material.isLineBasicMaterial ) ) {
+          c.visible = false;
+          hidden.push( c );
+        }
+      }
+    }
+    return () => {
+      restoreMats();
+      for ( const c of hidden ) c.visible = true;
+    };
   }
 
   // Undoes every live highlight (step flash, click flash, parts selection) so
@@ -933,15 +958,13 @@ function createViewer( container, modelUrl ) {
 
   // -------------------------------------------------------------- anatomy tour
 
-  function resolveAnchor( spec ) {
-    const world = new THREE.Vector3();
-    model.updateWorldMatrix( true, true );
-
-    // Match bricks by submodel name and/or colour code, both checked along
-    // the whole ancestor chain (alias parts carry their colour on an outer
-    // group; submodel membership is always an ancestor).
+  // Bricks a tour stop refers to: matched by submodel name and/or colour
+  // code, both checked along the whole ancestor chain (alias parts carry
+  // their colour on an outer group; submodel membership is always an
+  // ancestor). Returns null when the spec has no geometry filters.
+  function matchSpotBricks( spec ) {
+    if ( ! spec.group && ! spec.color ) return null;
     let bricks = ensureBrickData();
-    let filtered = false;
     if ( spec.group ) {
       bricks = bricks.filter( g => {
         for ( let a = g; a && a !== scene; a = a.parent ) {
@@ -950,7 +973,6 @@ function createViewer( container, modelUrl ) {
         }
         return false;
       } );
-      filtered = true;
     }
     if ( spec.color ) {
       bricks = bricks.filter( g => {
@@ -959,10 +981,17 @@ function createViewer( container, modelUrl ) {
         }
         return false;
       } );
-      filtered = true;
     }
+    return bricks;
+  }
 
-    if ( filtered && bricks.length ) {
+  function resolveAnchor( spec ) {
+    const world = new THREE.Vector3();
+    model.updateWorldMatrix( true, true );
+
+    let bricks = matchSpotBricks( spec );
+
+    if ( bricks && bricks.length ) {
       // Optionally narrow to one region so the dot sits on the component's
       // visible face instead of a centroid floating between parts.
       const yOf = g => g.getWorldPosition( new THREE.Vector3() ).y;
@@ -1000,7 +1029,11 @@ function createViewer( container, modelUrl ) {
     if ( ! model || ! ANATOMY[ slug ] ) return;
     normalizeState();
     if ( ! tour ) {
-      const spots = ANATOMY[ slug ].map( spec => ( { ...spec, local: resolveAnchor( spec ) } ) );
+      const spots = ANATOMY[ slug ].map( spec => ( {
+        ...spec,
+        local: resolveAnchor( spec ),
+        bricks: spec.reveal ? matchSpotBricks( spec ) : null,
+      } ) );
       const dotsEl = document.createElement( 'div' );
       dotsEl.className = 'viewer-hotspots';
       spots.forEach( ( s, i ) => {
@@ -1020,7 +1053,7 @@ function createViewer( container, modelUrl ) {
       // the model. Fullscreen has no "below", so it reparents as an overlay.
       container.insertAdjacentElement( 'afterend', card );
       document.addEventListener( 'fullscreenchange', placeTourCard );
-      tour = { spots, dotsEl, card, open: false, idx: - 1 };
+      tour = { spots, dotsEl, card, open: false, idx: - 1, revealRestore: null };
     }
     tour.open = true;
     tour.dotsEl.style.display = '';
@@ -1048,6 +1081,7 @@ function createViewer( container, modelUrl ) {
     if ( ! tour || ! tour.open ) return;
     tour.open = false;
     tour.idx = - 1;
+    if ( tour.revealRestore ) { tour.revealRestore(); tour.revealRestore = null; }
     tour.dotsEl.style.display = 'none';
     tour.card.classList.remove( 'is-open' );
     camTween = null;
@@ -1058,6 +1092,14 @@ function createViewer( container, modelUrl ) {
     const s = tour.spots[ i ];
     tour.idx = i;
     tour.spots.forEach( ( sp, j ) => sp.dot.classList.toggle( 'is-active', j === i ) );
+
+    // Interior stops: fade every brick that is not part of this component,
+    // so it shows through the bricks that are in the way.
+    if ( tour.revealRestore ) { tour.revealRestore(); tour.revealRestore = null; }
+    if ( s.reveal && s.bricks && s.bricks.length ) {
+      const keep = new Set( s.bricks );
+      tour.revealRestore = swapDim( ensureBrickData().filter( g => ! keep.has( g ) ) );
+    }
 
     // Fly the camera: keep the current viewing direction, close in on the spot.
     const target = model.localToWorld( s.local.clone() );
@@ -1110,13 +1152,18 @@ function createViewer( container, modelUrl ) {
       model.localToWorld( v );
       if ( checkOcclusion ) {
         // Dim a dot when its component is hidden behind the model from the
-        // current angle, so the depth relationship stays readable.
-        const dist = v.distanceTo( camera.position );
-        dotRay.set( camera.position, v.clone().sub( camera.position ).normalize() );
-        const hit = dotRay.intersectObject( model, true ).find( i => i.object.isMesh );
-        // Generous margin: the anchor sits inside its component, whose own
-        // front face must not count as an occluder.
-        s.dot.classList.toggle( 'is-occluded', !! hit && hit.distance < dist - modelMaxDim * 0.08 );
+        // current angle, so the depth relationship stays readable. An active
+        // reveal stop is never dimmed — its blockers are faded out anyway.
+        if ( tour.revealRestore && s === tour.spots[ tour.idx ] ) {
+          s.dot.classList.remove( 'is-occluded' );
+        } else {
+          const dist = v.distanceTo( camera.position );
+          dotRay.set( camera.position, v.clone().sub( camera.position ).normalize() );
+          const hit = dotRay.intersectObject( model, true ).find( i => i.object.isMesh );
+          // Generous margin: the anchor sits inside its component, whose own
+          // front face must not count as an occluder.
+          s.dot.classList.toggle( 'is-occluded', !! hit && hit.distance < dist - modelMaxDim * 0.08 );
+        }
       }
       v.project( camera );
       const behind = v.z > 1;
