@@ -44,24 +44,40 @@
   min-width: 2rem;
 }
 
-/* Superposition button: a 0 and a 1 overlapping — both states at once. */
-.viewer-psi-btn {
+/* Superposition button: a 0 and a 1 overlapping — both states at once.
+   It is the section's main control, so it is bigger than the other extras
+   and ripples a few times on arrival so nobody overlooks it. */
+.viewer-btn.viewer-psi-btn {
   position: relative;
-  width: 2rem;
-  height: 1.75rem;
+  width: 2.6rem;
+  height: 2.3rem;
+  border-color: #1a7fd4;
+  background: rgba(255, 255, 255, .95);
+}
+
+/* Applied on creation and re-applied after each measurement. */
+.viewer-btn.viewer-psi-btn.is-beckoning {
+  animation: psi-beckon 2.2s ease-out 4;
 }
 
 .viewer-psi-btn span {
   position: absolute;
   top: 50%;
-  font-size: .9rem;
+  font-size: 1.15rem;
   font-weight: 700;
   line-height: 1;
-  opacity: .55;
+  color: #0b4f8c;
+  opacity: .6;
 }
 
 .viewer-psi-btn .psi-0 { left: 44%; transform: translate(-50%, -50%); }
 .viewer-psi-btn .psi-1 { left: 58%; transform: translate(-50%, -50%); }
+
+@keyframes psi-beckon {
+  0% { box-shadow: 0 0 0 0 rgba(26, 127, 212, .5); }
+  60% { box-shadow: 0 0 0 10px rgba(26, 127, 212, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(26, 127, 212, 0); }
+}
 
 /* Play/pause + drag-to-seek progress bar, pinned along the bottom edge. */
 .viewer-transport {
@@ -79,6 +95,30 @@
   padding: .2rem .5rem;
   line-height: 1;
   font-size: .9rem;
+}
+
+/* Play-mode toggle: whether ▶ and the bar play the brick-by-brick film or
+   the numbered instruction steps. */
+.viewer-mode {
+  flex: 0 0 auto;
+  display: flex;
+}
+
+.viewer-mode .viewer-btn {
+  padding: .2rem .45rem;
+  font-size: .68rem;
+  line-height: 1.2;
+  border-radius: 0;
+}
+
+.viewer-mode .viewer-btn:first-child { border-radius: 6px 0 0 6px; }
+.viewer-mode .viewer-btn:last-child { border-radius: 0 6px 6px 0; border-left: 0; }
+
+.viewer-mode .viewer-btn.is-active {
+  background: #dbeafe;
+  border-color: #1a7fd4;
+  color: #0b4f8c;
+  font-weight: 600;
 }
 
 .viewer-scrub {
@@ -156,18 +196,33 @@
   border-radius: 4px;
 }
 
-/* Interactive parts list panel. */
+/* Interactive parts list: sits in the page flow directly below the viewer so
+   it never covers the model. Rows stay clickable to highlight their lot. */
 .viewer-parts {
+  max-width: 640px;
+  margin: -0.5rem auto 1rem;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: #fcfcfb;
+  border: 1px solid #d0d7de;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Fullscreen has no "below the viewer": the list floats over the right edge. */
+.viewer-parts.is-overlay {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 34px;
   width: min(270px, 78%);
-  display: flex;
-  flex-direction: column;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: none;
+  margin: 0;
   background: rgba(255, 255, 255, .95);
+  border: 0;
   border-left: 1px solid #d0d7de;
+  border-radius: 0;
   backdrop-filter: blur(3px);
 }
 
@@ -192,7 +247,20 @@
   cursor: pointer;
 }
 
-.viewer-parts-list { overflow-y: auto; }
+/* Below the viewer there is width to spare: the lots flow into columns, and
+   long lists (172 lots on the 1024 model) scroll inside a capped height. */
+.viewer-parts-list {
+  overflow-y: auto;
+  max-height: 264px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  align-content: start;
+}
+
+.viewer-parts.is-overlay .viewer-parts-list {
+  max-height: none;
+  display: block;
+}
 
 .viewer-parts-row {
   display: flex;
@@ -451,7 +519,16 @@
 
 @media (max-width: 600px) {
   .viewer { aspect-ratio: 4 / 3; }
-  .viewer-status { max-width: 45%; } /* keep the scrubber usable next to it */
+  /* The transport is crowded on a phone: the status label moves to its own
+     full-width row above the buttons instead of squeezing the scrubber. */
+  .viewer-transport { flex-wrap: wrap-reverse; }
+  .viewer-status {
+    order: 10;
+    flex: 1 1 100%;
+    max-width: none;
+    text-align: center;
+  }
+  .viewer-mode .viewer-btn { padding: .18rem .3rem; font-size: .62rem; }
   .viewer-psi-hint { padding: .25rem .6rem; font-size: .72rem; }
 }
 

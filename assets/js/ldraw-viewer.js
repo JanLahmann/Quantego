@@ -131,25 +131,25 @@ const pendingShare = parseShareHash();
 
 const ANATOMY = {
   'quantego-one': [
-    { title: 'Glass enclosure', color: [ '47' ], pick: 'side', at: [ 0.04, 0.62, 0.5 ], body: 'The real IBM Quantum System One lives in a 2.7 m cube of half-inch borosilicate glass — an airtight case that isolates the machine from vibration and temperature swings while letting visitors admire it.' },
+    { title: 'Glass enclosure', color: [ '47' ], pick: 'side', at: [ 0.04, 0.62, 0.5 ], body: 'The real IBM Quantum System One is encased in a 2.7 m cube of half-inch borosilicate glass. The case shields the machine from dust, temperature swings and curious hands — while putting it on display like a museum piece.' },
     { title: 'Cryostat', color: [ '15' ], pick: 'mid', at: [ 0.5, 0.55, 0.5 ], body: 'The white cylinder is the cryostat: a dilution refrigerator that chills the hardware to about 15 millikelvin — colder than outer space — so the fragile quantum states of the qubits survive.' },
-    { title: 'Quantum processor', color: [ '15' ], pick: 'bottom', at: [ 0.5, 0.3, 0.5 ], body: 'At the very bottom of the cryostat hangs the quantum chip itself, smaller than a coin. IBM Quantum System One started with a 27-qubit Falcon processor; newer installations carry 127-qubit Eagle chips.' },
+    { title: 'Quantum processor', color: [ '15' ], pick: 'bottom', at: [ 0.5, 0.3, 0.5 ], body: 'The quantum chip itself stays invisible: it hangs inside the cryostat, at its very bottom, and is only a bit larger than a coin. IBM Quantum System One started with a 27-qubit Falcon processor; newer installations carry 127-qubit Eagle and even 156-qubit Heron chips.' },
     { title: 'Control rack', color: [ '0' ], pick: 'mid', at: [ 0.85, 0.4, 0.15 ], body: 'The black wall stands in for the racks of classical control electronics: they fire precisely timed microwave pulses at the qubits to run a circuit, then read the answers back out.' },
   ],
   'quantego-two': [
     { title: 'Modular walls', group: 'wall', at: [ 0.1, 0.55, 0.5 ], body: 'IBM Quantum System Two is modular: instead of one sealed glass cube, standardised units can be combined, serviced and extended — a design made to grow.' },
-    { title: 'Cryostat', group: 'cryostat', pick: 'top', at: [ 0.5, 0.7, 0.5 ], body: 'The open chamber in the middle is the cryostat: a larger cryogenic platform that can host multiple quantum processors side by side — the first System Two runs IBM Quantum Heron chips.' },
+    { title: 'Cryostat', group: 'cryostat', pick: 'top', at: [ 0.5, 0.7, 0.5 ], body: 'The chamber in the middle is the cryostat: a larger cryogenic platform that can host multiple quantum processors side by side — the first System Two runs IBM Quantum Heron chips. This model leaves it open so you can see the chandelier; in the real machine it is sealed shut.' },
     { title: 'Quantum chandelier', group: 'cryostat', color: [ '297', '15' ], at: [ 0.5, 0.45, 0.5 ], body: 'The golden stages and rods hanging inside are the "chandelier" that carries the qubits down to ~15 millikelvin — and it flashes whenever you run a circuit in the simulator below.' },
     { title: 'Control electronics', group: 'rack', pick: 'side', at: [ 0.85, 0.35, 0.5 ], body: 'Third-generation control electronics orchestrate microwave pulses across all processors in the system and stream the results to classical computers.' },
   ],
   'quantego-two-1024': [
-    { title: 'Base and floor', group: 'base', at: [ 0.5, 0.05, 0.5 ], body: 'The raised floor hides cabling, cooling and vibration isolation — in the real machine room, much of the engineering is invisible from above.' },
-    { title: 'Glass shell', color: [ '47' ], pick: 'side', at: [ 0.9, 0.6, 0.5 ], body: 'Like System One before it, the machine shows itself off: the enclosure is transparent, turning the computer into an exhibit.' },
+    { title: 'Base', group: 'base', at: [ 0.5, 0.05, 0.5 ], body: 'The machine stands on a raised base — a reminder that much of a quantum data centre\'s engineering, like power feeds, cabling and vibration isolation, stays out of sight.' },
+    { title: 'Glass shell', color: [ '47' ], pick: 'side', at: [ 0.9, 0.6, 0.5 ], body: 'The transparent shell is this LEGO model\'s own flourish: the real System Two hides its interior behind closed modular panels, but the model turns the machine into an exhibit you can look into.' },
     { title: 'Cryogenic chandelier', group: 'chandelier', reveal: true, at: [ 0.5, 0.55, 0.5 ], body: 'Inside the cryostat hangs the "chandelier": gold-plated stages, each roughly ten times colder than the one above, stepping down from room temperature to ~15 millikelvin at the quantum chip.' },
-    { title: 'Cryogenic rack', group: 'cryo rack', reveal: true, at: [ 0.4, 0.4, 0.5 ], body: 'Next to the chandelier stands the cryogenic rack: the pumps, valves and helium plumbing that keep the dilution refrigerator cold around the clock.' },
-    { title: 'Server rack', group: 'server rack', reveal: true, at: [ 0.6, 0.4, 0.5 ], body: 'Quantum computers are hybrids: a rack of classical servers prepares every circuit that runs and collects every shot that is measured.' },
-    { title: 'Cabling', group: 'rope', reveal: true, at: [ 0.5, 0.6, 0.5 ], body: 'Flexible lines snake down into the machine — microwave coax to control and read out every qubit, and the plumbing of the helium circuit.' },
-    { title: 'Service wings', group: 'wing', at: [ 0.15, 0.5, 0.5 ], body: 'The wings give technicians access to wiring and cryogenics — and the modular design means future System Twos can dock additional units.' },
+    { title: 'Cryogenic rack', group: 'cryo rack', reveal: true, at: [ 0.4, 0.4, 0.5 ], body: 'Built into the wall behind the system sits the cryogenic rack: the pumps, valves and helium plumbing that keep the dilution refrigerator cold around the clock.' },
+    { title: 'Server rack', group: 'server rack', reveal: true, at: [ 0.6, 0.4, 0.5 ], body: 'Quantum computers are hybrids: classical servers prepare every circuit that runs and collect every shot that is measured. The compact rack here is a stand-in — a real installation devotes far more classical hardware to the job.' },
+    { title: 'Cooling lines', group: 'rope', reveal: true, at: [ 0.5, 0.6, 0.5 ], body: 'The flexible lines snaking into the machine belong to the cooling system: they carry the helium mixture that keeps the cryostat at millikelvin temperatures. The microwave cabling that talks to the qubits runs deep inside, along the chandelier.' },
+    { title: 'Service wings', group: 'wing', pick: 'side', at: [ 0.15, 0.5, 0.5 ], body: 'The wings around the core give technicians access to wiring and cryogenics — and the modular design means future System Twos can dock additional units side by side.' },
   ],
 };
 
@@ -206,6 +206,19 @@ function createViewer( container, modelUrl ) {
   controls.autoRotate = false;
   controls.autoRotateSpeed = 1.2;
 
+  // A gesture only counts as "the user adjusted the view" when the camera
+  // actually moved — a plain click (identify, measure) must not count.
+  let gestureFrom = null;
+  controls.addEventListener( 'start', () => {
+    gestureFrom = { p: camera.position.clone(), t: controls.target.clone() };
+  } );
+  controls.addEventListener( 'end', () => {
+    if ( ! gestureFrom ) return;
+    const moved = camera.position.distanceTo( gestureFrom.p ) + controls.target.distanceTo( gestureFrom.t );
+    if ( moved > modelMaxDim * 0.01 ) viewAdjusted = true;
+    gestureFrom = null;
+  } );
+
   // Build animation style: 'fall' = bricks drop into place; 'reveal' = plain pop-in.
   const BUILD_STYLE = 'fall';
 
@@ -231,9 +244,15 @@ function createViewer( container, modelUrl ) {
   let explodeBtn = null;
   let scrubber = null; // range input that tracks / seeks build progress
   let playBtn = null; // play / pause toggle for the build animation
+  let modeBtns = null; // { bricks, steps } — play-mode segmented control
   let restartAt = null; // timestamp to auto-replay at (endless loop), or null
   let visible = false; // in-viewport flag; set by the IntersectionObserver
   let homeView = null; // the initial camera framing, restored before a circuit-run flash
+  let viewAdjusted = false; // the user rotated/zoomed deliberately; don't override their view
+  let playMode = 'bricks'; // '▶' granularity: 'bricks' (falling bricks) or 'steps' (instructions)
+  let stepPlayer = null; // { nextAt } — auto-advance through building steps, or null
+  let pulseFx = null; // { mats, base, start, dur } — throbbing chandelier glow, or null
+  const STEP_PLAY_MS = 1300; // ms per building step while playing in 'steps' mode
 
   let meta = null; // parsed MPD metadata (colours, part names, step captions)
   loadMeta( modelUrl ).then( m => { meta = m; } );
@@ -266,6 +285,7 @@ function createViewer( container, modelUrl ) {
   let ghost = null; // { copy, matsA, matsB, lines, origByMesh, phase, collapsing }
   let psiHint = null;
   let psiHintTimer = 0; // the hint fades out on its own after a few seconds
+  let psiBtn = null; // the 0/1 button; ripples again after each measurement
 
   const LOOP_DELAY = 3000; // ms to hold the finished model before looping
   let running = false;
@@ -383,10 +403,22 @@ function createViewer( container, modelUrl ) {
       g.userData.offsetLocal = g.getWorldPosition( new THREE.Vector3() ).applyQuaternion( invParent );
       g.userData.step = buildingStepOf( g );
       g.userData.order = order ++;
+      g.userData.effColor = effColorCode( g );
       arr.push( g );
     } );
     brickGroups = arr;
     return arr;
+  }
+
+  // The colour a brick actually renders in. Alias parts (dish 2654 -> 2654a,
+  // lightsaber 577b -> 64567a) hold their mesh in a subgroup whose colour code
+  // is 16 ("inherit"), so the real colour lives on an ancestor group.
+  function effColorCode( g ) {
+    for ( let a = g; a && a !== scene; a = a.parent ) {
+      const code = a.userData && a.userData.colorCode !== undefined ? String( a.userData.colorCode ) : null;
+      if ( code !== null && code !== '16' && code !== '24' ) return code;
+    }
+    return undefined;
   }
 
   function bricksInBuildOrder() {
@@ -452,9 +484,18 @@ function createViewer( container, modelUrl ) {
   }
 
   // Play/pause toggle: starts a build if none is running, otherwise pauses or
-  // resumes the current one.
+  // resumes the current one. In 'steps' mode it plays through the building
+  // steps instead, one instruction step at a time.
   function togglePlay() {
     if ( ! model ) return;
+    if ( playMode === 'steps' ) {
+      if ( stepPlayer ) { stepPlayer = null; updatePlayBtn(); return; }
+      if ( ! stepMode ) enterStepMode( 0 );
+      else if ( curStep >= numSteps - 1 ) setStep( 0 ); // replay from the top
+      stepPlayer = { nextAt: performance.now() + STEP_PLAY_MS };
+      updatePlayBtn();
+      return;
+    }
     if ( ! buildAnim || stepMode ) { playBuild(); return; }
     if ( buildAnim.paused ) {
       buildAnim.paused = false;
@@ -467,9 +508,41 @@ function createViewer( container, modelUrl ) {
 
   function updatePlayBtn() {
     if ( ! playBtn ) return;
-    const playing = buildAnim && ! buildAnim.paused && ! buildAnim.scrubbing;
+    const playing = ( buildAnim && ! buildAnim.paused && ! buildAnim.scrubbing ) || !! stepPlayer;
     playBtn.textContent = playing ? '⏸' : '▶';
     playBtn.setAttribute( 'aria-label', playing ? 'Pause' : 'Play build animation' );
+  }
+
+  // Switches what ▶ and the progress bar operate on: the falling-bricks film
+  // ('bricks') or the numbered instruction steps ('steps'). Steps mode makes
+  // the scrubber jump straight to any step — no endless ‹ › clicking on the
+  // 1024-brick model.
+  function setPlayMode( m ) {
+    if ( playMode === m || ! model ) return;
+    playMode = m;
+    if ( modeBtns ) {
+      modeBtns.bricks.classList.toggle( 'is-active', m === 'bricks' );
+      modeBtns.steps.classList.toggle( 'is-active', m === 'steps' );
+    }
+    stepPlayer = null;
+    restartAt = null;
+    if ( m === 'steps' ) {
+      if ( buildAnim ) finishBuild();
+      if ( ! stepMode ) enterStepMode( 0 );
+    } else {
+      if ( stepMode ) exitStepMode();
+      if ( scrubber ) scrubber.value = 0;
+    }
+    updatePlayBtn();
+  }
+
+  // Advances the step player; called once per rendered frame.
+  function stepStepPlayer() {
+    if ( ! stepPlayer || ! stepMode ) return;
+    if ( performance.now() < stepPlayer.nextAt ) return;
+    if ( curStep >= numSteps - 1 ) { stepPlayer = null; updatePlayBtn(); return; }
+    setStep( curStep + 1 );
+    stepPlayer.nextAt = performance.now() + STEP_PLAY_MS;
   }
 
   // Positions/reveals every brick for a given point on the timeline (ms).
@@ -511,8 +584,17 @@ function createViewer( container, modelUrl ) {
     }
   }
 
-  // User grabbed the scrubber: hold the build at the dragged position.
+  // User grabbed the scrubber: hold the build at the dragged position. In
+  // steps mode the bar is quantised to instruction steps and seeks directly.
   function onScrubInput() {
+    if ( playMode === 'steps' ) {
+      stepPlayer = null;
+      const k = Math.round( scrubber.value / 1000 * ( numSteps - 1 ) );
+      if ( ! stepMode ) enterStepMode( k );
+      else if ( k !== curStep ) setStep( k );
+      updatePlayBtn();
+      return;
+    }
     if ( stepMode ) exitStepMode();
     collapseGhost( null );
     const a = ensureBuildTimeline();
@@ -525,6 +607,7 @@ function createViewer( container, modelUrl ) {
 
   // User released the scrubber: resume from here, preserving the paused state.
   function onScrubRelease() {
+    if ( playMode === 'steps' ) return; // steps mode seeks live; stay put
     const a = buildAnim;
     if ( ! a ) return;
     const p = scrubber.value / 1000;
@@ -650,6 +733,8 @@ function createViewer( container, modelUrl ) {
   function exitStepMode() {
     if ( ! stepMode ) return;
     stepMode = false;
+    stepPlayer = null;
+    updatePlayBtn();
     clearStepFlash();
     if ( stepParts ) stepParts.style.display = 'none';
     setStatus( '' );
@@ -662,6 +747,9 @@ function createViewer( container, modelUrl ) {
     applyStep();
     const cap = stepCaption( n );
     setStatus( `Step ${n + 1} / ${numSteps}${cap ? ' · ' + cap : ''}` );
+    if ( playMode === 'steps' && scrubber ) {
+      scrubber.value = numSteps > 1 ? Math.round( n / ( numSteps - 1 ) * 1000 ) : 0;
+    }
     clearStepFlash(); // stepping fast must not strand the previous highlight
     const fresh = ensureBrickData().filter( g => g.userData.step === n );
     // Like printed instructions, the bricks added in this step stay softly
@@ -700,7 +788,7 @@ function createViewer( container, modelUrl ) {
     for ( const g of fresh ) {
       const file = ( g.name || '' ).split( '/' ).pop().toLowerCase();
       if ( ! /\.dat$/.test( file ) ) continue;
-      const code = g.userData.colorCode !== undefined ? String( g.userData.colorCode ) : '?';
+      const code = g.userData.effColor !== undefined ? g.userData.effColor : '?';
       const key = file + '|' + code;
       if ( ! lots.has( key ) ) lots.set( key, { file, code, count: 0, bricks: [] } );
       const lot = lots.get( key );
@@ -737,6 +825,8 @@ function createViewer( container, modelUrl ) {
 
   function stepPrev() {
     if ( ! model ) return;
+    stepPlayer = null; // manual stepping pauses the step player
+    updatePlayBtn();
     if ( ! stepMode ) { enterStepMode( numSteps - 1 ); return; }
     if ( curStep <= 0 ) { exitStepMode(); return; }
     setStep( curStep - 1 );
@@ -744,6 +834,8 @@ function createViewer( container, modelUrl ) {
 
   function stepNext() {
     if ( ! model ) return;
+    stepPlayer = null; // manual stepping pauses the step player
+    updatePlayBtn();
     if ( ! stepMode ) { enterStepMode( 0 ); return; }
     if ( curStep >= numSteps - 1 ) { exitStepMode(); return; }
     setStep( curStep + 1 );
@@ -895,7 +987,7 @@ function createViewer( container, modelUrl ) {
     const file = ( brick.name || '' ).split( '/' ).pop().toLowerCase();
     const num = file.replace( /\.dat$/, '' );
     const desc = ( meta && meta.parts[ file ] ) || 'LEGO part';
-    let code = brick.userData.colorCode;
+    let code = effColorCode( brick );
     let colName = ( meta && meta.colors[ code ] && meta.colors[ code ].name ) || '';
     let colHex = ( meta && meta.colors[ code ] && meta.colors[ code ].hex ) || '';
     if ( ! colHex ) {
@@ -939,6 +1031,7 @@ function createViewer( container, modelUrl ) {
   function togglePartsPanel() {
     if ( partsPanel ) {
       clearPartsSelection();
+      document.removeEventListener( 'fullscreenchange', placePartsPanel );
       partsPanel.remove();
       partsPanel = null;
       return;
@@ -951,7 +1044,7 @@ function createViewer( container, modelUrl ) {
     for ( const g of bricks ) {
       const file = ( g.name || '' ).split( '/' ).pop().toLowerCase();
       if ( ! /\.dat$/.test( file ) ) continue;
-      const code = g.userData.colorCode !== undefined ? String( g.userData.colorCode ) : '?';
+      const code = g.userData.effColor !== undefined ? g.userData.effColor : '?';
       const key = file + '|' + code;
       if ( ! lots.has( key ) ) lots.set( key, { file, code, count: 0, bricks: [] } );
       const lot = lots.get( key );
@@ -998,7 +1091,22 @@ function createViewer( container, modelUrl ) {
       list.appendChild( row );
     }
     partsPanel.appendChild( list );
-    container.appendChild( partsPanel );
+    placePartsPanel();
+    document.addEventListener( 'fullscreenchange', placePartsPanel );
+  }
+
+  // Like the tour card, the parts list lives below the viewer in the page
+  // flow so it never covers the model; fullscreen has no "below", so there
+  // it floats over the right edge instead.
+  function placePartsPanel() {
+    if ( ! partsPanel ) return;
+    if ( document.fullscreenElement === container ) {
+      if ( partsPanel.parentElement !== container ) container.appendChild( partsPanel );
+      partsPanel.classList.add( 'is-overlay' );
+    } else {
+      if ( partsPanel.previousElementSibling !== container ) container.insertAdjacentElement( 'afterend', partsPanel );
+      partsPanel.classList.remove( 'is-overlay' );
+    }
   }
 
   function clearPartsSelection() {
@@ -1418,7 +1526,12 @@ function createViewer( container, modelUrl ) {
         // The result then STAYS on screen until a new superposition is
         // prepared with the 0/1 button.
         ghost.done = true;
-        toast( `Measured: |${outcome}⟩ — it collapsed to ${outcome === 0 ? ghost.nameA : ghost.nameB}.` );
+        toast( `Measured: |${outcome}⟩ — it collapsed to ${outcome === 0 ? ghost.nameA : ghost.nameB}. Click again for a new superposition.` );
+        if ( psiBtn ) { // draw the eye to the way back in
+          psiBtn.classList.remove( 'is-beckoning' );
+          void psiBtn.offsetWidth;
+          psiBtn.classList.add( 'is-beckoning' );
+        }
         if ( outcome === 0 ) {
           collapseGhost( true ); // the survivor IS the viewer's own model
         } else {
@@ -1507,11 +1620,12 @@ function createViewer( container, modelUrl ) {
     if ( TWIN[ slug ] && isPsiViewer ) {
       // Icon: a 0 and a 1 overlapping — both states at once.
       const psi = viewerButton( '', toggleSuperposition );
-      psi.classList.add( 'viewer-psi-btn' );
+      psi.classList.add( 'viewer-psi-btn', 'is-beckoning' );
       psi.innerHTML = '<span class="psi-0">0</span><span class="psi-1">1</span>';
       psi.title = 'Superposition: System One and System Two at once — click the model to measure';
       psi.setAttribute( 'aria-label', 'Superposition easter egg' );
       extras.appendChild( psi );
+      psiBtn = psi;
     }
     const shot = viewerButton( '📸', screenshot );
     shot.title = 'Save a screenshot of this view';
@@ -1531,6 +1645,19 @@ function createViewer( container, modelUrl ) {
       playBtn = viewerButton( '▶', togglePlay );
       playBtn.classList.add( 'viewer-play' );
       playBtn.setAttribute( 'aria-label', 'Play build animation' );
+
+      // What ▶ and the bar play through: the brick-by-brick film, or the
+      // numbered instruction steps (with per-step highlights and parts).
+      const mode = document.createElement( 'div' );
+      mode.className = 'viewer-mode';
+      const mBricks = viewerButton( 'Bricks', () => setPlayMode( 'bricks' ) );
+      mBricks.title = 'Play the build brick by brick';
+      mBricks.classList.add( 'is-active' );
+      const mSteps = viewerButton( 'Steps', () => setPlayMode( 'steps' ) );
+      mSteps.title = 'Play or scrub through the numbered building steps — jump straight to any step';
+      mode.append( mBricks, mSteps );
+      modeBtns = { bricks: mBricks, steps: mSteps };
+
       scrubber = document.createElement( 'input' );
       scrubber.type = 'range';
       scrubber.min = 0;
@@ -1554,7 +1681,7 @@ function createViewer( container, modelUrl ) {
       sNext.title = 'Next building step';
       sNext.setAttribute( 'aria-label', 'Next building step' );
 
-      transport.append( playBtn, scrubber, statusLabel, sPrev, sNext );
+      transport.append( playBtn, mode, scrubber, statusLabel, sPrev, sNext );
       container.appendChild( transport );
     }
 
@@ -1567,7 +1694,11 @@ function createViewer( container, modelUrl ) {
       const moved = Math.hypot( e.clientX - downAt.x, e.clientY - downAt.y );
       downAt = null;
       if ( moved > 7 ) return;
-      if ( ghost ) { measure(); return; }
+      if ( ghost && ! ghost.done ) { measure(); return; }
+      // On the superposition viewer a click does everything: it measures a
+      // live superposition (above) and prepares a fresh one from a held
+      // result — no hunting for the 0/1 button.
+      if ( isPsiViewer && model ) { toggleSuperposition(); return; }
       identifyAt( e );
     } );
 
@@ -1584,27 +1715,49 @@ function createViewer( container, modelUrl ) {
         // that is where the circuit actually runs.
         if ( ! model || ghost || stepMode ) return;
         // Nothing may hide the flash: a running build assembles instantly
-        // (loop disarmed), an open tour closes, and the camera eases back to
-        // the default framing.
+        // (loop disarmed) and an open tour closes. The camera eases back to
+        // the default framing — but only if the user hasn't deliberately
+        // rotated or zoomed to a view of their own (a tour close-up always
+        // resets, since that framing was ours, not theirs).
         if ( buildAnim ) finishBuild();
         restartAt = null;
+        const wasTour = tour && tour.open;
         closeTour();
-        if ( homeView ) {
+        if ( homeView && ( wasTour || ! viewAdjusted ) ) {
           camTween = {
             p0: camera.position.clone(), p1: homeView.p.clone(),
             t0: controls.target.clone(), t1: homeView.t.clone(),
             start: performance.now(), dur: reduceMotion ? 1 : 450,
           };
+          viewAdjusted = false; // back at the default framing
         }
         if ( pulseRestore ) pulseRestore();
         const chan = chandelierBricks();
         const chanSet = new Set( chan );
         const rest = ensureBrickData().filter( g => ! chanSet.has( g ) );
-        const glow = swapHighlight( chan, 0xffb100, 1.2 );
+        const GLOW_BASE = 1.2;
+        const glow = swapHighlight( chan, 0xffab00, GLOW_BASE );
         const fade = swapDim( rest );
-        const restore = () => { glow(); fade(); };
+        // The glow throbs like a heartbeat — three beats per run — by
+        // modulating the emissive intensity of the highlight clones.
+        const mats = new Set();
+        for ( const g of chan ) {
+          for ( const c of g.children ) {
+            if ( ! c.isMesh ) continue;
+            ( Array.isArray( c.material ) ? c.material : [ c.material ] )
+              .forEach( m => { if ( m && 'emissiveIntensity' in m ) mats.add( m ); } );
+          }
+        }
+        const DUR = 1800;
+        if ( ! reduceMotion ) pulseFx = { mats: [ ...mats ], base: GLOW_BASE, start: performance.now(), dur: DUR };
+        const restore = () => {
+          glow();
+          fade();
+          for ( const m of mats ) m.emissiveIntensity = GLOW_BASE; // clones are cached and reused
+          pulseFx = null;
+        };
         pulseRestore = restore;
-        setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, 1400 );
+        setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, DUR );
       } );
     }
   }
@@ -1660,6 +1813,19 @@ function createViewer( container, modelUrl ) {
     ensureModelViewer();
   }
 
+  // Eases the chandelier glow up and down while a circuit-run pulse is live.
+  function stepPulseFx() {
+    if ( ! pulseFx ) return;
+    const t = ( performance.now() - pulseFx.start ) / pulseFx.dur;
+    if ( t >= 1 ) {
+      for ( const m of pulseFx.mats ) m.emissiveIntensity = pulseFx.base;
+      pulseFx = null;
+      return;
+    }
+    const throb = 0.55 + 0.75 * Math.abs( Math.sin( t * Math.PI * 3 ) ); // three beats
+    for ( const m of pulseFx.mats ) m.emissiveIntensity = pulseFx.base * throb;
+  }
+
   function renderLoop() {
     if ( ! running ) return;
     requestAnimationFrame( renderLoop );
@@ -1668,9 +1834,11 @@ function createViewer( container, modelUrl ) {
       playBuild();
     }
     stepBuildAnim();
+    stepStepPlayer();
     stepExplode();
     stepGhost();
     stepCamTween();
+    stepPulseFx();
     controls.update();
     renderer.render( scene, camera );
     updateHotspotDots();
@@ -2027,6 +2195,15 @@ function createCompareViewer( container, urls ) {
 }
 
 function initAll() {
+  // Every link that leads away from the page opens in a new tab, so the
+  // interactive viewers (and a half-built circuit) are never lost to a click.
+  for ( const a of document.querySelectorAll( 'a[href]' ) ) {
+    const href = a.getAttribute( 'href' ) || '';
+    if ( ! href || href.startsWith( '#' ) ) continue;
+    a.target = '_blank';
+    a.rel = 'noopener';
+  }
+
   const lazy = new IntersectionObserver( ( entries, observer ) => {
     for ( const entry of entries ) {
       if ( ! entry.isIntersecting ) continue;

@@ -17,15 +17,28 @@ const GATES = {
   H: { m: [ 1 / Math.SQRT2, 1 / Math.SQRT2, 1 / Math.SQRT2, - 1 / Math.SQRT2 ], hint: 'Hadamard — puts a qubit into an equal superposition of 0 and 1' },
   X: { m: [ 0, 1, 1, 0 ], hint: 'NOT — flips 0 to 1 and 1 to 0' },
   Z: { m: [ 1, 0, 0, - 1 ], hint: 'Phase flip — leaves 0 alone, negates the amplitude of 1' },
-  CX: { hint: 'CNOT — flips the target ⊕ whenever the control ● is 1. This is what entangles qubits' },
+  CX: { hint: 'CNOT (controlled-NOT) — flips the target ⊕ whenever the control ● is 1. This is what entangles qubits' },
 };
 
 // Preset circuits: singles are { g, q, col }, CNOTs are { g: 'CX', c, t, col }.
-// min is the smallest qubit count the preset fits on.
+// min is the smallest qubit count the preset fits on — picking a preset
+// switches the simulator to (at least) that many qubits.
 const PRESETS = {
-  'Coin flip': { min: 1, ops: [ { g: 'H', q: 0, col: 0 } ] },
-  'Bell pair': { min: 2, ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 } ] },
-  'GHZ state': { min: 3, ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 }, { g: 'CX', c: 1, t: 2, col: 2 } ] },
+  'Coin flip': {
+    min: 1,
+    desc: 'A single H gate makes a fair quantum coin: every shot lands 0 or 1, each with 50%.',
+    ops: [ { g: 'H', q: 0, col: 0 } ],
+  },
+  'Bell pair': {
+    min: 2,
+    desc: 'H plus CNOT entangles two qubits: about half the shots read 00 and half 11 — the qubits always agree.',
+    ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 } ],
+  },
+  'GHZ state': {
+    min: 3,
+    desc: 'Three qubits entangled at once: every shot reads 000 or 111, never anything in between.',
+    ops: [ { g: 'H', q: 0, col: 0 }, { g: 'CX', c: 0, t: 1, col: 1 }, { g: 'CX', c: 1, t: 2, col: 2 } ],
+  },
 };
 
 function applySingle( state, m, q ) {
@@ -138,13 +151,21 @@ function createSim( container ) {
 
   const presets = el( 'div', 'qsim-row' );
   presets.appendChild( el( 'span', 'qsim-rowlabel', 'Presets' ) );
-  const presetBtns = {};
   for ( const [ name, p ] of Object.entries( PRESETS ) ) {
-    const b = btn( 'qsim-preset', name, () => loadPreset( p.ops ) );
-    presetBtns[ name ] = b;
+    const b = btn( 'qsim-preset', name, () => usePreset( name ) );
+    b.title = p.desc;
     presets.appendChild( b );
   }
   presets.appendChild( btn( 'qsim-preset', 'Clear', () => loadPreset( [] ) ) );
+
+  // Presets work from any qubit count: one that needs more qubits than are
+  // selected simply switches the simulator up to fit.
+  function usePreset( name ) {
+    const p = PRESETS[ name ];
+    if ( p.min > qubits ) setQubits( p.min, p.ops );
+    else loadPreset( p.ops );
+    hint.textContent = `${name} — ${p.desc}`;
+  }
 
   function setTool( t ) {
     tool = t;
@@ -175,17 +196,16 @@ function createSim( container ) {
     }
   }
 
-  function setQubits( n ) {
+  function setQubits( n, ops ) {
     qubits = n;
     pending = null;
     for ( const [ k, b ] of Object.entries( qubitBtns ) ) b.classList.toggle( 'is-active', + k === n );
     buildGrid();
-    // A CNOT needs two wires; presets need at least their min qubit count.
+    // A CNOT needs two wires.
     toolBtns.CX.disabled = n < 2;
     if ( n < 2 && tool === 'CX' ) { setTool( 'H' ); }
-    for ( const [ name, p ] of Object.entries( PRESETS ) ) presetBtns[ name ].disabled = p.min > n;
     results.innerHTML = '';
-    loadPreset( ( n === 1 ? PRESETS[ 'Coin flip' ] : PRESETS[ 'Bell pair' ] ).ops );
+    loadPreset( ops || ( n === 1 ? PRESETS[ 'Coin flip' ] : PRESETS[ 'Bell pair' ] ).ops );
   }
 
   // One-line helper text under the grid; doubles as the CNOT placement prompt
@@ -259,7 +279,7 @@ function createSim( container ) {
     if ( tool === 'CX' ) {
       return pending
         ? `Control on ${wireName( pending.q )} — now click the target qubit in the same column (click ● again to cancel).`
-        : 'Click a cell to place the control ●, then click the target qubit ⊕ in the same column.';
+        : 'CNOT (controlled-NOT) flips the target ⊕ whenever the control ● is 1 — the gate that entangles qubits. Click a cell to place the control ●, then the target ⊕ in the same column.';
     }
     if ( tool === 'ERASE' ) return 'Click a gate to remove it.';
     return GATES[ tool ].hint + '.';
