@@ -133,7 +133,7 @@ const ANATOMY = {
   'quantego-one': [
     { title: 'Glass enclosure', color: [ '47' ], pick: 'side', at: [ 0.04, 0.62, 0.5 ], body: 'The real IBM Quantum System One lives in a 2.7 m cube of half-inch borosilicate glass — an airtight case that isolates the machine from vibration and temperature swings while letting visitors admire it.' },
     { title: 'Cryostat', color: [ '15' ], pick: 'mid', at: [ 0.5, 0.55, 0.5 ], body: 'The white cylinder is the cryostat: a dilution refrigerator that chills the hardware to about 15 millikelvin — colder than outer space — so the fragile quantum states of the qubits survive.' },
-    { title: 'Quantum processor', color: [ '15' ], pick: 'bottom', at: [ 0.5, 0.3, 0.5 ], body: 'At the very bottom of the cryostat hangs the quantum chip itself, smaller than a coin. The first System One carried a 20-qubit processor; later systems host 27-qubit Falcon and 127-qubit Eagle chips.' },
+    { title: 'Quantum processor', color: [ '15' ], pick: 'bottom', at: [ 0.5, 0.3, 0.5 ], body: 'At the very bottom of the cryostat hangs the quantum chip itself, smaller than a coin. IBM Quantum System One started with a 27-qubit Falcon processor; newer installations carry 127-qubit Eagle chips.' },
     { title: 'Control rack', color: [ '0' ], pick: 'mid', at: [ 0.85, 0.4, 0.15 ], body: 'The black wall stands in for the racks of classical control electronics: they fire precisely timed microwave pulses at the qubits to run a circuit, then read the answers back out.' },
   ],
   'quantego-two': [
@@ -214,6 +214,11 @@ function createViewer( container, modelUrl ) {
 
   const slug = ( modelUrl.match( /([^/]+)\.[a-z]+$/i ) || [] )[ 1 ] || modelUrl;
 
+  // The dedicated superposition viewer (data-superposition): it auto-enters
+  // the superposed state instead of playing the build animation, carries the
+  // 0/1 button, and skips the tour — the section around it tells the story.
+  const isPsiViewer = container.dataset.superposition !== undefined;
+
   let model = null;
   let modelMaxDim = 100;
   let modelSizeY = 100; // model height; the superposition twin stands on the same ground
@@ -263,7 +268,7 @@ function createViewer( container, modelUrl ) {
   const LOOP_DELAY = 3000; // ms to hold the finished model before looping
   let running = false;
 
-  const isMine = pendingShare && pendingShare.v === slug ? pendingShare : null;
+  const isMine = ! isPsiViewer && pendingShare && pendingShare.v === slug ? pendingShare : null;
   if ( isMine ) hasAutoPlayed = true; // a shared view takes precedence over autoplay
 
   const loader = new LDrawLoader();
@@ -550,10 +555,12 @@ function createViewer( container, modelUrl ) {
   // First time the viewer is both loaded and on screen, play the build once —
   // unless the user beat the autoplay to it (stepping, touring, ghosting or
   // scrubbing before the IntersectionObserver fires must not be stomped).
+  // The superposition viewer enters its superposed state instead.
   function maybeAutoPlay() {
     if ( hasAutoPlayed || reduceMotion || ! model || ! visible ) return;
     hasAutoPlayed = true;
     if ( stepMode || ghost || buildAnim || ( tour && tour.open ) ) return;
+    if ( isPsiViewer && TWIN[ slug ] ) { toggleSuperposition(); return; }
     playBuild();
   }
 
@@ -1428,7 +1435,7 @@ function createViewer( container, modelUrl ) {
     const bar = document.createElement( 'div' );
     bar.className = 'viewer-controls';
     explodeBtn = viewerButton( '⤢ Explode', toggleExplode );
-    if ( ANATOMY[ slug ] ) bar.appendChild( viewerButton( 'ℹ️ Tour', toggleTour ) );
+    if ( ANATOMY[ slug ] && ! isPsiViewer ) bar.appendChild( viewerButton( 'ℹ️ Tour', toggleTour ) );
     bar.appendChild( viewerButton( '🧱 Parts', togglePartsPanel ) );
     bar.appendChild( explodeBtn );
     if ( container.dataset.ar ) bar.appendChild( viewerButton( '📱 View in AR', openAR ) );
@@ -1437,7 +1444,7 @@ function createViewer( container, modelUrl ) {
     // Small icon-only extras on their own row.
     const extras = document.createElement( 'div' );
     extras.className = 'viewer-extras';
-    if ( TWIN[ slug ] ) {
+    if ( TWIN[ slug ] && isPsiViewer ) {
       // Icon: a 0 and a 1 overlapping — both states at once.
       const psi = viewerButton( '', toggleSuperposition );
       psi.classList.add( 'viewer-psi-btn' );
