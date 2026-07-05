@@ -30,13 +30,13 @@ The instructions, digital pictures, and animations were created with [BrickLink 
   <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
-
 <p align="center">
   <img src="Quantego-One/Quantego-One-v05.png" alt="Quantego" width="250"/>
   <img src="Quantego-One/Quantego-One-v05.jpg" alt="Quantego" width="250"/>
   <img src="Quantego-One/black-2x4.JPG" alt="Quantego" width="250"/>
 </p>
+
+<div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
 
 ### Build instructions 
 Build instructions can be found [here](Quantego-One/Quantego-One-v05-instructions.pdf)
