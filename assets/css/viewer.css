@@ -244,6 +244,9 @@
 
 .viewer-hotspot.is-active { background: #0b4f8c; transform: translate(-50%, -50%) scale(1.2); }
 
+/* The component this dot marks is currently hidden behind the model. */
+.viewer-hotspot.is-occluded { opacity: .4; }
+
 /* The explanation card sits in the page flow, directly below the viewer, so
    it never covers the model. */
 .viewer-tourcard {

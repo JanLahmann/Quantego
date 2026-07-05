@@ -118,23 +118,26 @@ const pendingShare = parseShareHash();
 
 // ---------------------------------------------------------------------------
 // "Anatomy of a quantum computer" tour content, keyed by model slug (the .mpd
-// basename). Anchors resolve against the loaded model: `group` matches a named
-// Studio submodel, `stepDesc` matches a Studio step caption (System One has no
-// submodels), and `at` is a fallback position in normalised bounding-box
-// coordinates [x, y, z] with y = 0 at the ground.
+// basename). Every stop anchors to actual bricks so the dot stays glued to
+// its component while the model rotates: `group` matches a named Studio
+// submodel, `color` matches LDraw colour codes (checked along the whole
+// ancestor chain, so alias parts count), both filters combine, and `pick`
+// narrows the match to one region ('side' = outermost brick, 'top'/'bottom' =
+// highest/lowest brick, 'mid' = the middle height band). `at` (normalised
+// bounding-box coordinates) is only a last-resort fallback.
 
 const ANATOMY = {
   'quantego-one': [
-    { title: 'Glass enclosure', at: [ 0.04, 0.62, 0.5 ], body: 'The real IBM Quantum System One lives in a 2.7 m cube of half-inch borosilicate glass — an airtight case that isolates the machine from vibration and temperature swings while letting visitors admire it.' },
-    { title: 'Cryostat', at: [ 0.5, 0.55, 0.5 ], body: 'The central cylinder is the cryostat: a dilution refrigerator that chills the hardware to about 15 millikelvin — colder than outer space — so the fragile quantum states of the qubits survive.' },
-    { title: 'Quantum processor', at: [ 0.5, 0.3, 0.5 ], body: 'At the very bottom of the cryostat hangs the quantum chip itself, smaller than a coin. The first System One carried a 20-qubit processor; later systems host 27-qubit Falcon and 127-qubit Eagle chips.' },
-    { title: 'Control rack', stepDesc: 'Rack', at: [ 0.85, 0.4, 0.15 ], body: 'The racks hold the classical control electronics: they fire precisely timed microwave pulses at the qubits to run a circuit, then read the answers back out.' },
+    { title: 'Glass enclosure', color: [ '47' ], pick: 'side', at: [ 0.04, 0.62, 0.5 ], body: 'The real IBM Quantum System One lives in a 2.7 m cube of half-inch borosilicate glass — an airtight case that isolates the machine from vibration and temperature swings while letting visitors admire it.' },
+    { title: 'Cryostat', color: [ '15' ], pick: 'mid', at: [ 0.5, 0.55, 0.5 ], body: 'The white cylinder is the cryostat: a dilution refrigerator that chills the hardware to about 15 millikelvin — colder than outer space — so the fragile quantum states of the qubits survive.' },
+    { title: 'Quantum processor', color: [ '15' ], pick: 'bottom', at: [ 0.5, 0.3, 0.5 ], body: 'At the very bottom of the cryostat hangs the quantum chip itself, smaller than a coin. The first System One carried a 20-qubit processor; later systems host 27-qubit Falcon and 127-qubit Eagle chips.' },
+    { title: 'Control rack', color: [ '0' ], pick: 'mid', at: [ 0.85, 0.4, 0.15 ], body: 'The black wall stands in for the racks of classical control electronics: they fire precisely timed microwave pulses at the qubits to run a circuit, then read the answers back out.' },
   ],
   'quantego-two': [
     { title: 'Modular walls', group: 'wall', at: [ 0.1, 0.55, 0.5 ], body: 'IBM Quantum System Two is modular: instead of one sealed glass cube, standardised units can be combined, serviced and extended — a design made to grow.' },
-    { title: 'Cryostat', group: 'cryostat', at: [ 0.5, 0.5, 0.5 ], body: 'A larger cryogenic platform that can host multiple quantum processors side by side — the first System Two runs IBM Quantum Heron chips.' },
-    { title: 'Control electronics', group: 'rack', at: [ 0.85, 0.35, 0.5 ], body: 'Third-generation control electronics orchestrate microwave pulses across all processors in the system and stream the results to classical computers.' },
-    { title: 'Quantum-centric supercomputing', at: [ 0.5, 0.95, 0.5 ], body: 'System Two is designed to be linked with classical supercomputers — and with other System Twos — into what IBM calls a quantum-centric supercomputer.' },
+    { title: 'Cryostat', group: 'cryostat', pick: 'top', at: [ 0.5, 0.7, 0.5 ], body: 'The open chamber in the middle is the cryostat: a larger cryogenic platform that can host multiple quantum processors side by side — the first System Two runs IBM Quantum Heron chips.' },
+    { title: 'Quantum chandelier', group: 'cryostat', color: [ '297', '15' ], at: [ 0.5, 0.45, 0.5 ], body: 'The golden stages and rods hanging inside are the "chandelier" that carries the qubits down to ~15 millikelvin — and it flashes whenever you run a circuit in the simulator below.' },
+    { title: 'Control electronics', group: 'rack', pick: 'side', at: [ 0.85, 0.35, 0.5 ], body: 'Third-generation control electronics orchestrate microwave pulses across all processors in the system and stream the results to classical computers.' },
   ],
   'quantego-two-1024': [
     { title: 'Base and floor', group: 'base', at: [ 0.5, 0.05, 0.5 ], body: 'The raised floor hides cabling, cooling and vibration isolation — in the real machine room, much of the engineering is invisible from above.' },
@@ -932,30 +935,55 @@ function createViewer( container, modelUrl ) {
 
   function resolveAnchor( spec ) {
     const world = new THREE.Vector3();
-    const box = new THREE.Box3();
+    model.updateWorldMatrix( true, true );
 
+    // Match bricks by submodel name and/or colour code, both checked along
+    // the whole ancestor chain (alias parts carry their colour on an outer
+    // group; submodel membership is always an ancestor).
+    let bricks = ensureBrickData();
+    let filtered = false;
     if ( spec.group ) {
-      const matches = [];
-      model.traverse( g => {
-        if ( g.isGroup && g.name && ! /\.dat$/i.test( g.name ) &&
-             g.name.toLowerCase().includes( spec.group ) ) matches.push( g );
+      bricks = bricks.filter( g => {
+        for ( let a = g; a && a !== scene; a = a.parent ) {
+          if ( a.isGroup && a.name && ! /\.dat$/i.test( a.name ) &&
+               a.name.toLowerCase().includes( spec.group ) ) return true;
+        }
+        return false;
       } );
-      if ( matches.length ) {
-        const all = new THREE.Box3();
-        for ( const g of matches ) all.union( box.setFromObject( g ) );
-        return model.worldToLocal( all.getCenter( world ) );
-      }
+      filtered = true;
     }
-    if ( spec.stepDesc && meta && meta.captions.length ) {
-      const steps = [];
-      meta.captions.forEach( ( c, i ) => { if ( c && c.startsWith( spec.stepDesc ) ) steps.push( i ); } );
-      const bricks = ensureBrickData().filter( g => steps.includes( g.userData.step ) );
-      if ( bricks.length ) {
-        const all = new THREE.Box3();
-        for ( const g of bricks ) all.union( box.setFromObject( g ) );
-        return model.worldToLocal( all.getCenter( world ) );
-      }
+    if ( spec.color ) {
+      bricks = bricks.filter( g => {
+        for ( let a = g; a && a !== scene; a = a.parent ) {
+          if ( a.userData && spec.color.includes( String( a.userData.colorCode ) ) ) return true;
+        }
+        return false;
+      } );
+      filtered = true;
     }
+
+    if ( filtered && bricks.length ) {
+      // Optionally narrow to one region so the dot sits on the component's
+      // visible face instead of a centroid floating between parts.
+      const yOf = g => g.getWorldPosition( new THREE.Vector3() ).y;
+      if ( spec.pick === 'side' ) {
+        bricks = [ bricks.reduce( ( a, b ) =>
+          Math.abs( b.getWorldPosition( world ).x ) > Math.abs( a.getWorldPosition( new THREE.Vector3() ).x ) ? b : a ) ];
+      } else if ( spec.pick === 'top' || spec.pick === 'bottom' ) {
+        bricks = [ bricks.reduce( ( a, b ) =>
+          ( spec.pick === 'top' ? yOf( b ) > yOf( a ) : yOf( b ) < yOf( a ) ) ? b : a ) ];
+      } else if ( spec.pick === 'mid' ) {
+        const ys = bricks.map( yOf );
+        const lo = Math.min( ...ys ), hi = Math.max( ...ys );
+        const mid = bricks.filter( ( g, i ) => ys[ i ] > lo + ( hi - lo ) * 0.25 && ys[ i ] < lo + ( hi - lo ) * 0.75 );
+        if ( mid.length ) bricks = mid;
+      }
+      const box = new THREE.Box3();
+      const all = new THREE.Box3();
+      for ( const g of bricks ) all.union( box.setFromObject( g ) );
+      return model.worldToLocal( all.getCenter( world ) );
+    }
+
     // Fallback: normalised bounding-box coordinates on the assembled model.
     const mb = new THREE.Box3().setFromObject( model );
     const size = mb.getSize( new THREE.Vector3() );
@@ -1069,13 +1097,28 @@ function createViewer( container, modelUrl ) {
     if ( t >= 1 ) camTween = null;
   }
 
+  let dotFrame = 0;
+  const dotRay = new THREE.Raycaster();
+
   function updateHotspotDots() {
     if ( ! tour || ! tour.open ) return;
     const w = container.clientWidth, h = container.clientHeight;
     const v = new THREE.Vector3();
+    const checkOcclusion = ( dotFrame ++ % 8 ) === 0; // raycasts are not free
     for ( const s of tour.spots ) {
       v.copy( s.local );
-      model.localToWorld( v ).project( camera );
+      model.localToWorld( v );
+      if ( checkOcclusion ) {
+        // Dim a dot when its component is hidden behind the model from the
+        // current angle, so the depth relationship stays readable.
+        const dist = v.distanceTo( camera.position );
+        dotRay.set( camera.position, v.clone().sub( camera.position ).normalize() );
+        const hit = dotRay.intersectObject( model, true ).find( i => i.object.isMesh );
+        // Generous margin: the anchor sits inside its component, whose own
+        // front face must not count as an occluder.
+        s.dot.classList.toggle( 'is-occluded', !! hit && hit.distance < dist - modelMaxDim * 0.08 );
+      }
+      v.project( camera );
       const behind = v.z > 1;
       s.dot.style.display = behind ? 'none' : '';
       if ( ! behind ) {
