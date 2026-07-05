@@ -21,7 +21,7 @@ Currently, we feature three different versions: a LEGO model of IBM Quantum Syst
 For each of the models, build instructions and a parts list are provided.
 The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
 
-💡 **The 3D viewers below are interactive.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, 🔗 copies a link to your exact view — and on System Two, the overlapping **0/1** button hides a small quantum surprise.
+💡 **The 3D viewers below are interactive.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
 
 
 ## IBM Quantum System One
@@ -112,6 +112,15 @@ The digital design file is available [here](Quantego-Two-1024/Quantego-Two-1024_
 
 ### Disclaimer
 This 1024-brick model has been designed by LEGO amateurs (not professionals): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
+
+
+## Superposition
+
+A qubit does not have to choose between 0 and 1. Until it is measured, it can be in a *superposition*: both states at once, each carried with its own weight — the *amplitude*. A measurement forces the decision: the outcome is random, 0 or 1, with probabilities given by the squares of those amplitudes — and the superposition is gone.
+
+Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability. The overlapping **0/1** button prepares the superposition again.
+
+<div class="viewer" data-model="/assets/models/quantego-two.mpd" data-superposition="true"></div>
 
 
 ## Compare the models
