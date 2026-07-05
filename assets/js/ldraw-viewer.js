@@ -233,6 +233,7 @@ function createViewer( container, modelUrl ) {
   let playBtn = null; // play / pause toggle for the build animation
   let restartAt = null; // timestamp to auto-replay at (endless loop), or null
   let visible = false; // in-viewport flag; set by the IntersectionObserver
+  let homeView = null; // the initial camera framing, restored before a circuit-run flash
 
   let meta = null; // parsed MPD metadata (colours, part names, step captions)
   loadMeta( modelUrl ).then( m => { meta = m; } );
@@ -312,6 +313,7 @@ function createViewer( container, modelUrl ) {
     camera.updateProjectionMatrix();
     controls.target.set( 0, 0, 0 );
     controls.update();
+    homeView = { p: camera.position.clone(), t: controls.target.clone() };
 
     addContactShadow( size );
     addControls();
@@ -1581,10 +1583,19 @@ function createViewer( container, modelUrl ) {
         // while the golden chandelier lights up amber — in the real machine,
         // that is where the circuit actually runs.
         if ( ! model || ghost || stepMode ) return;
-        // A running build animation would hide the flash: assemble the model
-        // instantly and stop the loop from restarting over it.
+        // Nothing may hide the flash: a running build assembles instantly
+        // (loop disarmed), an open tour closes, and the camera eases back to
+        // the default framing.
         if ( buildAnim ) finishBuild();
         restartAt = null;
+        closeTour();
+        if ( homeView ) {
+          camTween = {
+            p0: camera.position.clone(), p1: homeView.p.clone(),
+            t0: controls.target.clone(), t1: homeView.t.clone(),
+            start: performance.now(), dur: reduceMotion ? 1 : 450,
+          };
+        }
         if ( pulseRestore ) pulseRestore();
         const chan = chandelierBricks();
         const chanSet = new Set( chan );
