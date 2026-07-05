@@ -1031,6 +1031,7 @@ function createViewer( container, modelUrl ) {
   function togglePartsPanel() {
     if ( partsPanel ) {
       clearPartsSelection();
+      document.removeEventListener( 'fullscreenchange', placePartsPanel );
       partsPanel.remove();
       partsPanel = null;
       return;
@@ -1090,7 +1091,22 @@ function createViewer( container, modelUrl ) {
       list.appendChild( row );
     }
     partsPanel.appendChild( list );
-    container.appendChild( partsPanel );
+    placePartsPanel();
+    document.addEventListener( 'fullscreenchange', placePartsPanel );
+  }
+
+  // Like the tour card, the parts list lives below the viewer in the page
+  // flow so it never covers the model; fullscreen has no "below", so there
+  // it floats over the right edge instead.
+  function placePartsPanel() {
+    if ( ! partsPanel ) return;
+    if ( document.fullscreenElement === container ) {
+      if ( partsPanel.parentElement !== container ) container.appendChild( partsPanel );
+      partsPanel.classList.add( 'is-overlay' );
+    } else {
+      if ( partsPanel.previousElementSibling !== container ) container.insertAdjacentElement( 'afterend', partsPanel );
+      partsPanel.classList.remove( 'is-overlay' );
+    }
   }
 
   function clearPartsSelection() {
