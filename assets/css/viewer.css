@@ -221,6 +221,58 @@
 
 .viewer-parts-count { flex: 0 0 auto; color: #57606a; }
 
+/* Per-step parts callout: which bricks the current step adds — the
+   interactive version of the parts box in printed instructions. */
+.viewer-stepparts {
+  position: absolute;
+  top: 92px;
+  left: 10px;
+  width: min(210px, 56%);
+  max-height: calc(100% - 140px);
+  overflow-y: auto;
+  padding: .3rem 0 .15rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: #1b1f24;
+  background: rgba(255, 255, 255, .93);
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  backdrop-filter: blur(2px);
+}
+
+.viewer-stepparts-head {
+  padding: 0 .55rem .25rem;
+  font-size: .72rem;
+  font-weight: 600;
+  color: #57606a;
+}
+
+.viewer-stepparts-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: .22rem .55rem;
+  font-size: .72rem;
+  text-align: left;
+  color: #1b1f24;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.viewer-stepparts-row:hover { background: #f2f6fa; }
+
+.viewer-stepparts-count {
+  flex: 0 0 auto;
+  font-variant-numeric: tabular-nums;
+  color: #57606a;
+}
+
+@media (max-width: 600px) {
+  .viewer-stepparts { top: 84px; width: min(170px, 52%); }
+  .viewer-stepparts-head, .viewer-stepparts-row { font-size: .68rem; }
+}
+
 /* Anatomy tour: numbered hotspot dots + explanation card. */
 .viewer-hotspots { position: absolute; inset: 0; pointer-events: none; }
 

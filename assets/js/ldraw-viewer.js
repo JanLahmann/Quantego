@@ -243,7 +243,8 @@ function createViewer( container, modelUrl ) {
   let numSteps = 1;
   let stepNames = null; // per-step caption derived from submodel names, lazy
   let statusLabel = null; // shared label: brick counter while playing, step while stepping
-  let stepFlash = null; // { bricks, until } — bricks highlighted for the current step
+  let stepFlash = null; // { restore } — this step's soft highlight on its new bricks
+  let stepParts = null; // per-step parts callout element
 
   // Part identification / highlight
   const highlightMats = new Map(); // original material -> Map( color -> emissive clone )
@@ -648,6 +649,7 @@ function createViewer( container, modelUrl ) {
     if ( ! stepMode ) return;
     stepMode = false;
     clearStepFlash();
+    if ( stepParts ) stepParts.style.display = 'none';
     setStatus( '' );
     if ( model ) for ( const g of ensureBrickData() ) g.visible = true;
     controls.autoRotate = ! reduceMotion;
@@ -658,16 +660,17 @@ function createViewer( container, modelUrl ) {
     applyStep();
     const cap = stepCaption( n );
     setStatus( `Step ${n + 1} / ${numSteps}${cap ? ' · ' + cap : ''}` );
-    clearStepFlash(); // stepping fast must not strand the previous flash
-    if ( ! reduceMotion ) {
-      const fresh = ensureBrickData().filter( g => g.userData.step === n );
-      stepFlash = { bricks: fresh, until: performance.now() + 750, applied: false };
-    }
+    clearStepFlash(); // stepping fast must not strand the previous highlight
+    const fresh = ensureBrickData().filter( g => g.userData.step === n );
+    // Like printed instructions, the bricks added in this step stay softly
+    // tinted for the whole step, and a callout lists what to pick up.
+    if ( fresh.length ) stepFlash = { restore: swapHighlight( fresh, 0x1a7fd4, 0.45 ) };
+    updateStepParts( fresh );
   }
 
-  // Restores a still-applied step flash before dropping it.
+  // Restores the current step's highlight before dropping it.
   function clearStepFlash() {
-    if ( stepFlash && stepFlash.applied ) stepFlash.restore();
+    if ( stepFlash ) stepFlash.restore();
     stepFlash = null;
   }
 
@@ -675,17 +678,58 @@ function createViewer( container, modelUrl ) {
     for ( const g of ensureBrickData() ) g.visible = g.userData.step <= curStep;
   }
 
-  // Briefly tints the bricks added by the current step so they stand out.
-  function stepStepFlash() {
-    if ( ! stepFlash ) return;
-    const now = performance.now();
-    if ( ! stepFlash.applied ) {
-      stepFlash.applied = true;
-      stepFlash.restore = swapHighlight( stepFlash.bricks );
+  // The per-step parts callout: which bricks (part + colour + count) the
+  // current step adds — the interactive version of the parts box printed
+  // next to each step in the PDF instructions.
+  function updateStepParts( fresh ) {
+    if ( ! stepParts ) {
+      stepParts = document.createElement( 'div' );
+      stepParts.className = 'viewer-stepparts';
+      container.appendChild( stepParts );
     }
-    if ( now >= stepFlash.until ) {
-      stepFlash.restore();
-      stepFlash = null;
+    stepParts.innerHTML = '';
+    stepParts.style.display = '';
+    const head = document.createElement( 'div' );
+    head.className = 'viewer-stepparts-head';
+    head.textContent = 'Add these bricks';
+    stepParts.appendChild( head );
+
+    const lots = new Map();
+    for ( const g of fresh ) {
+      const file = ( g.name || '' ).split( '/' ).pop().toLowerCase();
+      if ( ! /\.dat$/.test( file ) ) continue;
+      const code = g.userData.colorCode !== undefined ? String( g.userData.colorCode ) : '?';
+      const key = file + '|' + code;
+      if ( ! lots.has( key ) ) lots.set( key, { file, code, count: 0, bricks: [] } );
+      const lot = lots.get( key );
+      lot.count ++;
+      lot.bricks.push( g );
+    }
+    for ( const lot of [ ...lots.values() ].sort( ( a, b ) => b.count - a.count ) ) {
+      const num = lot.file.replace( /\.dat$/, '' );
+      const desc = ( meta && meta.parts[ lot.file ] ) || num;
+      const col = ( meta && meta.colors[ lot.code ] ) || {};
+      const row = document.createElement( 'button' );
+      row.type = 'button';
+      row.className = 'viewer-stepparts-row';
+      row.title = `${desc} (${num})${col.name ? ' — ' + col.name : ''}. Click to flash these bricks in the model.`;
+      const sw = document.createElement( 'span' );
+      sw.className = 'viewer-chip-swatch';
+      sw.style.background = col.hex || '#ccc';
+      const count = document.createElement( 'span' );
+      count.className = 'viewer-stepparts-count';
+      count.textContent = lot.count + '×';
+      const label = document.createElement( 'span' );
+      label.className = 'viewer-parts-name';
+      label.textContent = desc;
+      row.append( sw, count, label );
+      row.addEventListener( 'click', () => {
+        if ( flashRestore ) flashRestore();
+        const restore = swapHighlight( lot.bricks, 0xffb100, 0.9 );
+        flashRestore = restore;
+        setTimeout( () => { if ( flashRestore === restore ) { restore(); flashRestore = null; } }, 1200 );
+      } );
+      stepParts.appendChild( row );
     }
   }
 
@@ -1536,7 +1580,11 @@ function createViewer( container, modelUrl ) {
         // Look inside the cryostat: everything else fades to near-transparent
         // while the golden chandelier lights up amber — in the real machine,
         // that is where the circuit actually runs.
-        if ( ! model || buildAnim || ghost || stepMode ) return;
+        if ( ! model || ghost || stepMode ) return;
+        // A running build animation would hide the flash: assemble the model
+        // instantly and stop the loop from restarting over it.
+        if ( buildAnim ) finishBuild();
+        restartAt = null;
         if ( pulseRestore ) pulseRestore();
         const chan = chandelierBricks();
         const chanSet = new Set( chan );
@@ -1610,7 +1658,6 @@ function createViewer( container, modelUrl ) {
     }
     stepBuildAnim();
     stepExplode();
-    stepStepFlash();
     stepGhost();
     stepCamTween();
     controls.update();

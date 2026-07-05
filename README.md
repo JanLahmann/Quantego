@@ -21,9 +21,6 @@ Currently, we feature three different versions: a LEGO model of IBM Quantum Syst
 For each of the models, build instructions and a parts list are provided.
 The instructions, digital pictures, and animations were created with [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) LEGO digital design software. Part numbers (3001, 4201, etc.) are as on [BrickLink](https://www.bricklink.com/).
 
-💡 **The 3D viewers below are interactive.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build brick by brick with the ‹ › buttons. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
-
-
 ## IBM Quantum System One
 
 <p align="center">
@@ -37,6 +34,8 @@ The instructions, digital pictures, and animations were created with [BrickLink 
 </p>
 
 <div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
+
+💡 **This 3D viewer is interactive — like all of them on this page.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build with the ‹ › buttons: every step highlights its new bricks and lists exactly which parts to add, like interactive build instructions. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
 
 ### Build instructions 
 Build instructions can be found [here](Quantego-One/Quantego-One-v05-instructions.pdf)
