@@ -35,7 +35,7 @@ The instructions, digital pictures, and animations were created with [BrickLink 
 
 <div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
 
-💡 **This 3D viewer is interactive — like all of them on this page.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build with the ‹ › buttons: every step highlights its new bricks and lists exactly which parts to add, like interactive build instructions. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
+💡 **This 3D viewer is interactive — like all of them on this page.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build with the ‹ › buttons: every step highlights its new bricks and lists exactly which parts to add, like interactive build instructions. Switch the play bar from **Bricks** to **Steps** and the ▶ button and progress bar play or scrub through whole building steps — the fastest way to jump to a specific step, especially in the 1024-brick model. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
 
 ### Build instructions 
 Build instructions can be found [here](Quantego-One/Quantego-One-v05-instructions.pdf)
@@ -117,7 +117,7 @@ This 1024-brick model has been designed by LEGO amateurs (not professionals): du
 
 A qubit does not have to choose between 0 and 1. Until it is measured, it can be in a *superposition*: both states at once, each carried with its own weight — the *amplitude*. A measurement forces the decision: the outcome is random, 0 or 1, with probabilities given by the squares of those amplitudes — and the superposition is gone.
 
-Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability, and stays that way until the overlapping **0/1** button prepares a new superposition.
+Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability, and stays that way until the next click (or the glowing **0/1** button) prepares a new superposition.
 
 <div class="viewer" data-model="/assets/models/quantego-two.mpd" data-superposition="true"></div>
 
