@@ -1580,7 +1580,11 @@ function createViewer( container, modelUrl ) {
         // Look inside the cryostat: everything else fades to near-transparent
         // while the golden chandelier lights up amber — in the real machine,
         // that is where the circuit actually runs.
-        if ( ! model || buildAnim || ghost || stepMode ) return;
+        if ( ! model || ghost || stepMode ) return;
+        // A running build animation would hide the flash: assemble the model
+        // instantly and stop the loop from restarting over it.
+        if ( buildAnim ) finishBuild();
+        restartAt = null;
         if ( pulseRestore ) pulseRestore();
         const chan = chandelierBricks();
         const chanSet = new Set( chan );
