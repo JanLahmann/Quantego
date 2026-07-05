@@ -555,12 +555,18 @@ function createViewer( container, modelUrl ) {
   // First time the viewer is both loaded and on screen, play the build once —
   // unless the user beat the autoplay to it (stepping, touring, ghosting or
   // scrubbing before the IntersectionObserver fires must not be stomped).
-  // The superposition viewer enters its superposed state instead.
+  // The superposition viewer enters its superposed state instead — also for
+  // reduced-motion users, since a static superposition is a state, not motion.
   function maybeAutoPlay() {
-    if ( hasAutoPlayed || reduceMotion || ! model || ! visible ) return;
+    if ( hasAutoPlayed || ! model || ! visible ) return;
+    if ( isPsiViewer && TWIN[ slug ] ) {
+      hasAutoPlayed = true;
+      if ( ! ghost && ! stepMode && ! buildAnim ) toggleSuperposition();
+      return;
+    }
+    if ( reduceMotion ) return;
     hasAutoPlayed = true;
     if ( stepMode || ghost || buildAnim || ( tour && tour.open ) ) return;
-    if ( isPsiViewer && TWIN[ slug ] ) { toggleSuperposition(); return; }
     playBuild();
   }
 
@@ -627,6 +633,7 @@ function createViewer( container, modelUrl ) {
     if ( ! model ) return;
     collapseGhost( null );
     if ( buildAnim ) finishBuild();
+    restartAt = null; // a pending build-loop restart must not stomp step mode
     exploded = false;
     explodeTarget = 0;
     if ( explodeBtn ) explodeBtn.textContent = '⤢ Explode';
@@ -1226,7 +1233,9 @@ function createViewer( container, modelUrl ) {
 
   function toggleSuperposition() {
     if ( ! model || ! TWIN[ slug ] ) return;
-    if ( ghost ) { measure(); return; }
+    if ( ghost && ! ghost.done ) { measure(); return; }
+    // No ghost, or a held measurement result: prepare a fresh superposition
+    // (normalizeState tears the held survivor down first).
     normalizeState();
     closeTour();
     hideChip();
@@ -1360,26 +1369,27 @@ function createViewer( container, modelUrl ) {
         // The fade runs on ghost materials (transparent, no depth writes),
         // which look x-ray-ish at full opacity — so the survivor snaps back
         // to its real solid materials the moment the collapse completes.
+        // The result then STAYS on screen until a new superposition is
+        // prepared with the 0/1 button.
         ghost.done = true;
         toast( `Measured: |${outcome}⟩ — it collapsed to ${outcome === 0 ? ghost.nameA : ghost.nameB}.` );
         if ( outcome === 0 ) {
-          collapseGhost( true ); // the survivor IS the section's own model
+          collapseGhost( true ); // the survivor IS the viewer's own model
         } else {
-          // The twin survived: show it solid for a beat, then quietly bring
-          // the section's own model back.
           model.visible = false;
           for ( const [ o, m ] of ghost.copyOrig ) o.material = m;
           for ( const l of ghost.copyHidden ) l.visible = true;
           ghost.copy.rotation.y = 0;
-          ghost.timer = setTimeout( () => collapseGhost( true ), 2800 );
+          controls.autoRotate = ! reduceMotion;
         }
       }
       return;
     }
 
-    // Idle superposition: the two machines breathe apart around the rest pose.
+    // Idle superposition: the two machines breathe apart around the rest pose
+    // (a fixed split for users who prefer reduced motion).
     const t = ( now - ghost.start ) / 1000;
-    const spread = 0.3 + 0.06 * Math.sin( t * 1.7 );
+    const spread = reduceMotion ? 0.3 : 0.3 + 0.06 * Math.sin( t * 1.7 );
     model.rotation.y = - spread;
     ghost.copy.rotation.y = spread;
   }
@@ -1435,9 +1445,13 @@ function createViewer( container, modelUrl ) {
     const bar = document.createElement( 'div' );
     bar.className = 'viewer-controls';
     explodeBtn = viewerButton( '⤢ Explode', toggleExplode );
-    if ( ANATOMY[ slug ] && ! isPsiViewer ) bar.appendChild( viewerButton( 'ℹ️ Tour', toggleTour ) );
-    bar.appendChild( viewerButton( '🧱 Parts', togglePartsPanel ) );
-    bar.appendChild( explodeBtn );
+    // The dedicated superposition viewer stays minimal: no tour, parts or
+    // explode — nothing that would tear down a measured state.
+    if ( ! isPsiViewer ) {
+      if ( ANATOMY[ slug ] ) bar.appendChild( viewerButton( 'ℹ️ Tour', toggleTour ) );
+      bar.appendChild( viewerButton( '🧱 Parts', togglePartsPanel ) );
+      bar.appendChild( explodeBtn );
+    }
     if ( container.dataset.ar ) bar.appendChild( viewerButton( '📱 View in AR', openAR ) );
     if ( container.requestFullscreen ) bar.appendChild( viewerButton( '⛶ Fullscreen', toggleFullscreen ) );
 
@@ -1464,36 +1478,39 @@ function createViewer( container, modelUrl ) {
     container.append( bar, extras );
 
     // Transport bar: play/pause, drag-to-seek, status label, step buttons.
-    const transport = document.createElement( 'div' );
-    transport.className = 'viewer-transport';
-    playBtn = viewerButton( '▶', togglePlay );
-    playBtn.classList.add( 'viewer-play' );
-    playBtn.setAttribute( 'aria-label', 'Play build animation' );
-    scrubber = document.createElement( 'input' );
-    scrubber.type = 'range';
-    scrubber.min = 0;
-    scrubber.max = 1000;
-    scrubber.value = 0;
-    scrubber.className = 'viewer-scrub';
-    scrubber.setAttribute( 'aria-label', 'Build animation progress' );
-    scrubber.addEventListener( 'input', onScrubInput );
-    scrubber.addEventListener( 'change', onScrubRelease );
+    // The superposition viewer has no build animation, so no transport either.
+    if ( ! isPsiViewer ) {
+      const transport = document.createElement( 'div' );
+      transport.className = 'viewer-transport';
+      playBtn = viewerButton( '▶', togglePlay );
+      playBtn.classList.add( 'viewer-play' );
+      playBtn.setAttribute( 'aria-label', 'Play build animation' );
+      scrubber = document.createElement( 'input' );
+      scrubber.type = 'range';
+      scrubber.min = 0;
+      scrubber.max = 1000;
+      scrubber.value = 0;
+      scrubber.className = 'viewer-scrub';
+      scrubber.setAttribute( 'aria-label', 'Build animation progress' );
+      scrubber.addEventListener( 'input', onScrubInput );
+      scrubber.addEventListener( 'change', onScrubRelease );
 
-    statusLabel = document.createElement( 'span' );
-    statusLabel.className = 'viewer-status';
-    statusLabel.style.display = 'none';
+      statusLabel = document.createElement( 'span' );
+      statusLabel.className = 'viewer-status';
+      statusLabel.style.display = 'none';
 
-    const sPrev = viewerButton( '‹', stepPrev );
-    sPrev.classList.add( 'viewer-play' );
-    sPrev.title = 'Previous building step';
-    sPrev.setAttribute( 'aria-label', 'Previous building step' );
-    const sNext = viewerButton( '›', stepNext );
-    sNext.classList.add( 'viewer-play' );
-    sNext.title = 'Next building step';
-    sNext.setAttribute( 'aria-label', 'Next building step' );
+      const sPrev = viewerButton( '‹', stepPrev );
+      sPrev.classList.add( 'viewer-play' );
+      sPrev.title = 'Previous building step';
+      sPrev.setAttribute( 'aria-label', 'Previous building step' );
+      const sNext = viewerButton( '›', stepNext );
+      sNext.classList.add( 'viewer-play' );
+      sNext.title = 'Next building step';
+      sNext.setAttribute( 'aria-label', 'Next building step' );
 
-    transport.append( playBtn, scrubber, statusLabel, sPrev, sNext );
-    container.appendChild( transport );
+      transport.append( playBtn, scrubber, statusLabel, sPrev, sNext );
+      container.appendChild( transport );
+    }
 
     // Click-to-identify (and click-to-measure while in superposition). A click
     // is a pointerup that barely moved, so orbiting never triggers it.

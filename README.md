@@ -118,7 +118,7 @@ This 1024-brick model has been designed by LEGO amateurs (not professionals): du
 
 A qubit does not have to choose between 0 and 1. Until it is measured, it can be in a *superposition*: both states at once, each carried with its own weight — the *amplitude*. A measurement forces the decision: the outcome is random, 0 or 1, with probabilities given by the squares of those amplitudes — and the superposition is gone.
 
-Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability. The overlapping **0/1** button prepares the superposition again.
+Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability, and stays that way until the overlapping **0/1** button prepares a new superposition.
 
 <div class="viewer" data-model="/assets/models/quantego-two.mpd" data-superposition="true"></div>
 
