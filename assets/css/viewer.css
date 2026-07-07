@@ -716,3 +716,24 @@
 @media (max-width: 480px) {
   .qsim-cell { width: 32px; height: 32px; }
 }
+
+/* ------------------------------------------------------------------------- */
+/* Fun with Quantum family footer                                            */
+/* ------------------------------------------------------------------------- */
+
+.family-footer {
+  margin: 3rem auto 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid #d0d7de;
+  text-align: center;
+  font-size: .85rem;
+  color: #57606a;
+}
+
+.family-footer > div { margin: .4rem 0; }
+
+.family-footer-tagline {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: .74rem;
+  letter-spacing: .08em;
+}
