@@ -1,0 +1,11 @@
+<!-- Interactive 3D viewers and the quantum-circuit simulator. Loaded from the
+     Jekyll layout so README.md stays clean when rendered on github.com, which
+     strips <script> tags but leaks their content as text. -->
+<link rel="stylesheet" href="/assets/css/viewer.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module" src="/assets/js/ldraw-viewer.js"></script>
