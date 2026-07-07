@@ -245,6 +245,7 @@ function createViewer( container, modelUrl ) {
   let scrubber = null; // range input that tracks / seeks build progress
   let playBtn = null; // play / pause toggle for the build animation
   let modeBtns = null; // { bricks, steps } — play-mode segmented control
+  let stepBtns = null; // { prev, next } — the ‹ › buttons; tooltips follow the play mode
   let restartAt = null; // timestamp to auto-replay at (endless loop), or null
   let visible = false; // in-viewport flag; set by the IntersectionObserver
   let homeView = null; // the initial camera framing, restored before a circuit-run flash
@@ -260,6 +261,7 @@ function createViewer( container, modelUrl ) {
   // Step-through instruction mode
   let stepMode = false;
   let curStep = 0;
+  let curBrick = null; // brick-granularity cursor (index in build order) while ‹ › step per brick, or null
   let numSteps = 1;
   let stepNames = null; // per-step caption derived from submodel names, lazy
   let statusLabel = null; // shared label: brick counter while playing, step while stepping
@@ -496,7 +498,12 @@ function createViewer( container, modelUrl ) {
       updatePlayBtn();
       return;
     }
-    if ( ! buildAnim || stepMode ) { playBuild(); return; }
+    if ( ! buildAnim || stepMode ) {
+      const fromBrick = stepMode ? curBrick : null; // ▶ after brick-stepping resumes the film there
+      playBuild();
+      if ( fromBrick !== null && buildAnim ) buildAnim.startTime = performance.now() - fromBrick * buildAnim.stagger;
+      return;
+    }
     if ( buildAnim.paused ) {
       buildAnim.paused = false;
       buildAnim.startTime = performance.now() - buildAnim.progress * buildAnim.totalDur;
@@ -524,11 +531,19 @@ function createViewer( container, modelUrl ) {
       modeBtns.bricks.classList.toggle( 'is-active', m === 'bricks' );
       modeBtns.steps.classList.toggle( 'is-active', m === 'steps' );
     }
+    if ( stepBtns ) {
+      const unit = m === 'steps' ? 'building step' : 'brick';
+      stepBtns.prev.title = `Previous ${unit}`;
+      stepBtns.prev.setAttribute( 'aria-label', `Previous ${unit}` );
+      stepBtns.next.title = `Next ${unit}`;
+      stepBtns.next.setAttribute( 'aria-label', `Next ${unit}` );
+    }
     stepPlayer = null;
     restartAt = null;
     if ( m === 'steps' ) {
       if ( buildAnim ) finishBuild();
       if ( ! stepMode ) enterStepMode( 0 );
+      else if ( curBrick !== null ) setStep( curStep ); // same place, coarser grain
     } else {
       if ( stepMode ) exitStepMode();
       if ( scrubber ) scrubber.value = 0;
@@ -715,8 +730,8 @@ function createViewer( container, modelUrl ) {
     return stepNames[ n ] || '';
   }
 
-  function enterStepMode( n ) {
-    if ( ! model ) return;
+  // Shared setup for both stepping granularities (building steps and single bricks).
+  function enterStepShell() {
     collapseGhost( null );
     if ( buildAnim ) finishBuild();
     restartAt = null; // a pending build-loop restart must not stomp step mode
@@ -727,12 +742,24 @@ function createViewer( container, modelUrl ) {
     ensureBrickData();
     stepMode = true;
     controls.autoRotate = false;
+  }
+
+  function enterStepMode( n ) {
+    if ( ! model ) return;
+    enterStepShell();
     setStep( THREE.MathUtils.clamp( n, 0, numSteps - 1 ) );
+  }
+
+  function enterBrickMode( k ) {
+    if ( ! model ) return;
+    enterStepShell();
+    setBrick( THREE.MathUtils.clamp( k, 0, ensureBrickData().length - 1 ) );
   }
 
   function exitStepMode() {
     if ( ! stepMode ) return;
     stepMode = false;
+    curBrick = null;
     stepPlayer = null;
     updatePlayBtn();
     clearStepFlash();
@@ -744,6 +771,7 @@ function createViewer( container, modelUrl ) {
 
   function setStep( n ) {
     curStep = n;
+    curBrick = null;
     applyStep();
     const cap = stepCaption( n );
     setStatus( `Step ${n + 1} / ${numSteps}${cap ? ' · ' + cap : ''}` );
@@ -758,6 +786,21 @@ function createViewer( container, modelUrl ) {
     updateStepParts( fresh );
   }
 
+  // Brick-granularity sibling of setStep: the first k+1 bricks of the build
+  // order are placed, the newest one is tinted and called out.
+  function setBrick( k ) {
+    const bricks = bricksInBuildOrder();
+    curBrick = k;
+    curStep = bricks[ k ].userData.step; // captions and share links stay step-aware
+    applyStep();
+    const cap = stepCaption( curStep );
+    setStatus( `🧱 ${k + 1} / ${bricks.length}${cap ? ' · ' + cap : ''}` );
+    if ( scrubber ) scrubber.value = bricks.length > 1 ? Math.round( k / ( bricks.length - 1 ) * 1000 ) : 0;
+    clearStepFlash();
+    stepFlash = { restore: swapHighlight( [ bricks[ k ] ], 0x1a7fd4, 0.45 ) };
+    updateStepParts( [ bricks[ k ] ] );
+  }
+
   // Restores the current step's highlight before dropping it.
   function clearStepFlash() {
     if ( stepFlash ) stepFlash.restore();
@@ -765,6 +808,11 @@ function createViewer( container, modelUrl ) {
   }
 
   function applyStep() {
+    if ( curBrick !== null ) {
+      const bricks = bricksInBuildOrder();
+      for ( let i = 0; i < bricks.length; i ++ ) bricks[ i ].visible = i <= curBrick;
+      return;
+    }
     for ( const g of ensureBrickData() ) g.visible = g.userData.step <= curStep;
   }
 
@@ -781,7 +829,7 @@ function createViewer( container, modelUrl ) {
     stepParts.style.display = '';
     const head = document.createElement( 'div' );
     head.className = 'viewer-stepparts-head';
-    head.textContent = 'Add these bricks';
+    head.textContent = fresh.length === 1 ? 'Add this brick' : 'Add these bricks';
     stepParts.appendChild( head );
 
     const lots = new Map();
@@ -827,6 +875,7 @@ function createViewer( container, modelUrl ) {
     if ( ! model ) return;
     stepPlayer = null; // manual stepping pauses the step player
     updatePlayBtn();
+    if ( playMode === 'bricks' ) { nudgeBrick( - 1 ); return; }
     if ( ! stepMode ) { enterStepMode( numSteps - 1 ); return; }
     if ( curStep <= 0 ) { exitStepMode(); return; }
     setStep( curStep - 1 );
@@ -836,9 +885,38 @@ function createViewer( container, modelUrl ) {
     if ( ! model ) return;
     stepPlayer = null; // manual stepping pauses the step player
     updatePlayBtn();
+    if ( playMode === 'bricks' ) { nudgeBrick( 1 ); return; }
     if ( ! stepMode ) { enterStepMode( 0 ); return; }
     if ( curStep >= numSteps - 1 ) { exitStepMode(); return; }
     setStep( curStep + 1 );
+  }
+
+  // ‹ › in Bricks mode: place or remove one brick at a time, in build order.
+  function nudgeBrick( d ) {
+    const total = ensureBrickData().length;
+    if ( ! total ) return;
+    if ( ! stepMode || curBrick === null ) {
+      // Entering: pick up from the film position when one is running, from the
+      // current building step when one is shown (a shared link), otherwise
+      // from whichever end matches the direction.
+      let k = d > 0 ? 0 : total - 1;
+      if ( buildAnim ) {
+        const a = buildAnim;
+        const elapsed = ( a.scrubbing || a.paused ) ? a.progress * a.totalDur : performance.now() - a.startTime;
+        const landed = THREE.MathUtils.clamp( Math.floor( elapsed / a.stagger ) + 1, 0, total );
+        k = THREE.MathUtils.clamp( landed - 1 + d, 0, total - 1 );
+      } else if ( stepMode ) {
+        const bricks = bricksInBuildOrder();
+        let last = 0;
+        for ( let i = 0; i < total; i ++ ) if ( bricks[ i ].userData.step <= curStep ) last = i;
+        k = THREE.MathUtils.clamp( last + d, 0, total - 1 );
+      }
+      enterBrickMode( k );
+      return;
+    }
+    const k = curBrick + d;
+    if ( k < 0 || k >= total ) { exitStepMode(); return; }
+    setBrick( k );
   }
 
   // ------------------------------------------------- part identification
@@ -1674,12 +1752,13 @@ function createViewer( container, modelUrl ) {
 
       const sPrev = viewerButton( '‹', stepPrev );
       sPrev.classList.add( 'viewer-play' );
-      sPrev.title = 'Previous building step';
-      sPrev.setAttribute( 'aria-label', 'Previous building step' );
+      sPrev.title = 'Previous brick';
+      sPrev.setAttribute( 'aria-label', 'Previous brick' );
       const sNext = viewerButton( '›', stepNext );
       sNext.classList.add( 'viewer-play' );
-      sNext.title = 'Next building step';
-      sNext.setAttribute( 'aria-label', 'Next building step' );
+      sNext.title = 'Next brick';
+      sNext.setAttribute( 'aria-label', 'Next brick' );
+      stepBtns = { prev: sPrev, next: sNext };
 
       transport.append( playBtn, mode, scrubber, statusLabel, sPrev, sNext );
       container.appendChild( transport );
