@@ -2,14 +2,6 @@
 
 ## Quantego is a family of LEGO models of IBM Quantum Computers
 
-<link rel="stylesheet" href="/assets/css/viewer.css">
-<script type="importmap">
-{ "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-} }
-</script>
-
 The first version of Quantego was created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
@@ -157,6 +149,4 @@ The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDra
   </div>
   <div>Open source, built by <a href="https://www.linkedin.com/in/JanLahmann">Jan-R. Lahmann</a> and the RasQberry community.</div>
 </footer>
-
-<script type="module" src="/assets/js/ldraw-viewer.js"></script>
 

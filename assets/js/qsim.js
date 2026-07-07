@@ -21,8 +21,8 @@ const GATES = {
 };
 
 // Preset circuits: singles are { g, q, col }, CNOTs are { g: 'CX', c, t, col }.
-// min is the smallest qubit count the preset fits on — picking a preset
-// switches the simulator to (at least) that many qubits.
+// min is the qubit count the preset is written for — picking a preset
+// switches the simulator to exactly that many qubits.
 const PRESETS = {
   'Coin flip': {
     min: 1,
@@ -158,11 +158,11 @@ function createSim( container ) {
   }
   presets.appendChild( btn( 'qsim-preset', 'Clear', () => loadPreset( [] ) ) );
 
-  // Presets work from any qubit count: one that needs more qubits than are
-  // selected simply switches the simulator up to fit.
+  // Presets work from any qubit count: choosing one switches the simulator
+  // to exactly the number of qubits the preset is written for.
   function usePreset( name ) {
     const p = PRESETS[ name ];
-    if ( p.min > qubits ) setQubits( p.min, p.ops );
+    if ( p.min !== qubits ) setQubits( p.min, p.ops );
     else loadPreset( p.ops );
     hint.textContent = `${name} — ${p.desc}`;
   }
