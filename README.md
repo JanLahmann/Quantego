@@ -138,15 +138,22 @@ LEGO and BrickLink are trademarks of the LEGO Group. IBM and IBM Quantum are tra
 
 The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDrawLoader` and `OrbitControls`) and use the [LDraw™ Parts Library](https://www.ldraw.org) (parts geometry is licensed [CC BY](https://www.ldraw.org/article/745.html)). Augmented-reality viewing is powered by [&lt;model-viewer&gt;](https://modelviewer.dev). The quantum circuit simulator is a self-contained statevector simulation that runs entirely in your browser. The models were designed in [BrickLink Studio](https://www.bricklink.com/v3/studio/download.page).
 
+<!-- FWQ-FAMILY:START format=html — generated from family.json in JanLahmann/Fun-with-Quantum, do not edit by hand -->
 <footer class="family-footer">
   <div class="family-footer-tagline">GOD DOES PLAY DICE. COME PLAY, BUILD, LEARN.</div>
-  <div><strong>Part of the Fun with Quantum family:</strong>
-    <a href="https://fun-with-quantum.org">Fun with Quantum</a> ·
-    <a href="https://rasqberry.org">RasQberry Two</a> ·
-    <a href="https://rasqberry.one">RasQberry One</a> ·
-    <a href="https://qutie.org">Qutie</a> ·
-    <a href="https://qoffee-maker.org">Qoffee-Maker</a>
+  <div class="family-footer-lead"><strong>Part of the Fun with Quantum family:</strong></div>
+  <div class="family-footer-members">
+    <a class="member" href="https://fun-with-quantum.org"><span>Fun with Quantum</span><small>Quantum games &amp; the family home</small></a>
+    <a class="member" href="https://rasqberry.org"><span>RasQberry Two</span><small>Pi-powered quantum computer model</small></a>
+    <a class="member" href="https://rasqberry.one"><span>RasQberry One</span><small>The original Pi model</small></a>
+    <a class="member" href="https://qutie.org"><span>Qutie</span><small>Palm-sized 3D-printed models</small></a>
+    <a class="member" href="https://qoffee-maker.org"><span>Qoffee-Maker</span><small>Order coffee with a circuit</small></a>
+    <a class="member" href="https://entangible.org"><span>Entangible</span><small>Hands-on circuit composer for booths</small></a>
+    <a class="member" href="https://certiq.dev"><span>CertiQ</span><small>Qiskit certification prep</small></a>
+    <a class="member" href="https://qubins.org"><span>QuBins</span><small>One-click Qiskit environments</small></a>
+    <a class="member" href="https://qamposer.org"><span>QAMPoser</span><small>Web quantum circuit composer</small></a>
   </div>
-  <div>Open source, built by <a href="https://www.linkedin.com/in/JanLahmann">Jan-R. Lahmann</a> and the RasQberry community.</div>
+  <div class="family-footer-credit">Open source, built by <a href="https://www.linkedin.com/in/JanLahmann">Jan-R. Lahmann</a> and the RasQberry community.</div>
 </footer>
+<!-- FWQ-FAMILY:END -->
 
