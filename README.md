@@ -37,7 +37,7 @@ All three models shown side by side at the same physical scale. Drag to rotate, 
 💡 **This 3D viewer is interactive — like all of them on this page.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build with the ‹ › buttons — they place or remove one brick at a time. Switch the play bar from **Bricks** to **Steps** and ▶, the progress bar and ‹ › work on whole building steps instead: every step highlights its new bricks and lists exactly which parts to add, like interactive build instructions — and the fastest way to jump to a specific step, especially in the 1024-brick model. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
 
 ### Build instructions 
-Build instructions can be found [here](Quantego-One/Quantego-One-v05-instructions.pdf)
+Build instructions can be found <a href="Quantego-One/Quantego-One-v05-instructions.pdf" data-umami-event="download" data-umami-event-kind="pdf" data-umami-event-file="Quantego-One-v05-instructions.pdf">here</a>
 
 ### Parts List
 
@@ -47,7 +47,7 @@ Build instructions can be found [here](Quantego-One/Quantego-One-v05-instruction
 
 ### Digital design
 
-The digital design file is available [here](Quantego-One/Quantego-One-v05.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-One/Quantego-One-v05.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available <a href="Quantego-One/Quantego-One-v05.io" data-umami-event="download" data-umami-event-kind="studio" data-umami-event-file="Quantego-One-v05.io">here</a>. This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open <a href="Quantego-One/Quantego-One-v05.ldr" data-umami-event="download" data-umami-event-kind="ldraw" data-umami-event-file="Quantego-One-v05.ldr">LDraw format</a> (`.ldr`), which is what powers the interactive 3D viewer above.
 
 
 
@@ -66,7 +66,7 @@ The digital design file is available [here](Quantego-One/Quantego-One-v05.io). T
 The real machine runs *quantum circuits* — so here is one you can play with. Place an **H** gate to put a qubit into superposition, add a **CNOT** to entangle it with another qubit (click once to place the control ●, then click the target ⊕), and press run: the circuit is simulated right in your browser and measured 1024 times. Every run makes the golden *chandelier* inside the cryostat of the model above flash — that is where the qubits live, at 15 millikelvin, and this model lets you look right at them. Try the *Bell pair* preset — the two entangled qubits always agree, no matter how often you measure. Prefer it simpler? Switch the simulator down to one or two qubits.
 
 ### Build instructions 
-Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pdf)
+Build instructions can be found <a href="Quantego-Two/Quantego-Two-instructions.pdf" data-umami-event="download" data-umami-event-kind="pdf" data-umami-event-file="Quantego-Two-instructions.pdf">here</a>
 
 ### Parts List
 
@@ -76,7 +76,7 @@ Build instructions can be found [here](Quantego-Two/Quantego-Two-instructions.pd
 
 ### Digital design
 
-The digital design file is available [here](Quantego-Two/Quantego-Two.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open [LDraw format](Quantego-Two/Quantego-Two.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available <a href="Quantego-Two/Quantego-Two.io" data-umami-event="download" data-umami-event-kind="studio" data-umami-event-file="Quantego-Two.io">here</a>. This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page) and used to order the bricks at any of the [BrickLink](https://www.bricklink.com/) shops. The model is also available in the open <a href="Quantego-Two/Quantego-Two.ldr" data-umami-event="download" data-umami-event-kind="ldraw" data-umami-event-file="Quantego-Two.ldr">LDraw format</a> (`.ldr`), which is what powers the interactive 3D viewer above.
 
 
 
@@ -99,14 +99,14 @@ Here are some photos of the built model; more will be posted in the [Photos](htt
 </p>
 
 ### Build instructions 
-Build instructions can be found [here](Quantego-Two-1024/Quantego-Two-1024_v3_instructions.pdf).
+Build instructions can be found <a href="Quantego-Two-1024/Quantego-Two-1024_v3_instructions.pdf" data-umami-event="download" data-umami-event-kind="pdf" data-umami-event-file="Quantego-Two-1024_v3_instructions.pdf">here</a>.
 
 ### Parts List
-Parts list can be found at the end of the build instructions file. You can also download [this json](Quantego-Two-1024/Quantego-Two-1024_v3_PAB.json) and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
+Parts list can be found at the end of the build instructions file. You can also download <a href="Quantego-Two-1024/Quantego-Two-1024_v3_PAB.json" data-umami-event="download" data-umami-event-kind="pab-json" data-umami-event-file="Quantego-Two-1024_v3_PAB.json">this json</a> and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
 
 ### Digital design
 
-The digital design file is available [here](Quantego-Two-1024/Quantego-Two-1024_v3_studio.io). This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page). The model is also available in the open [LDraw format](Quantego-Two-1024/Quantego-Two-1024_v3_studio.ldr) (`.ldr`), which is what powers the interactive 3D viewer above.
+The digital design file is available <a href="Quantego-Two-1024/Quantego-Two-1024_v3_studio.io" data-umami-event="download" data-umami-event-kind="studio" data-umami-event-file="Quantego-Two-1024_v3_studio.io">here</a>. This .io file can be imported into [BrickLink Studio](https://www.bricklink.com/v3/studio/main.page). The model is also available in the open <a href="Quantego-Two-1024/Quantego-Two-1024_v3_studio.ldr" data-umami-event="download" data-umami-event-kind="ldraw" data-umami-event-file="Quantego-Two-1024_v3_studio.ldr">LDraw format</a> (`.ldr`), which is what powers the interactive 3D viewer above.
 
 ### Disclaimer
 This 1024-brick model has been designed by LEGO amateurs (not professionals): due to its rather complex design, it could be subject to issues. Any feedback for improvement is welcome!
