@@ -143,15 +143,16 @@ The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDra
   <div class="family-footer-tagline">GOD DOES PLAY DICE. COME PLAY, BUILD, LEARN.</div>
   <div class="family-footer-lead"><strong>Part of the Fun with Quantum family:</strong></div>
   <div class="family-footer-members">
-    <a class="member" href="https://fun-with-quantum.org" data-umami-event="family-footer" data-umami-event-to="fun-with-quantum"><span>Fun with Quantum</span><small>Quantum games &amp; the family home</small></a>
-    <a class="member" href="https://rasqberry.org" data-umami-event="family-footer" data-umami-event-to="rasqberry-two"><span>RasQberry Two</span><small>Pi-powered quantum computer model</small></a>
-    <a class="member" href="https://rasqberry.one" data-umami-event="family-footer" data-umami-event-to="rasqberry-one"><span>RasQberry One</span><small>The original Pi model</small></a>
-    <a class="member" href="https://qutie.org" data-umami-event="family-footer" data-umami-event-to="qutie"><span>Qutie</span><small>Palm-sized 3D-printed models</small></a>
-    <a class="member" href="https://qoffee-maker.org" data-umami-event="family-footer" data-umami-event-to="qoffee-maker"><span>Qoffee-Maker</span><small>Order coffee with a circuit</small></a>
-    <a class="member" href="https://entangible.org" data-umami-event="family-footer" data-umami-event-to="entangible"><span>Entangible</span><small>Hands-on circuit composer for booths</small></a>
-    <a class="member" href="https://certiq.dev" data-umami-event="family-footer" data-umami-event-to="certiq"><span>CertiQ</span><small>Qiskit certification prep</small></a>
-    <a class="member" href="https://qubins.org" data-umami-event="family-footer" data-umami-event-to="qubins"><span>QuBins</span><small>One-click Qiskit environments</small></a>
-    <a class="member" href="https://qamposer.org" data-umami-event="family-footer" data-umami-event-to="qamposer"><span>QAMPoser</span><small>Web quantum circuit composer</small></a>
+    <a class="member" href="https://fun-with-quantum.org" data-umami-event="Quantego: family footer click" data-umami-event-to="fun-with-quantum"><span>Fun with Quantum</span><small>Quantum games &amp; the family home</small></a>
+    <a class="member" href="https://rasqberry.org" data-umami-event="Quantego: family footer click" data-umami-event-to="rasqberry-two"><span>RasQberry Two</span><small>Pi-powered quantum computer model</small></a>
+    <a class="member" href="https://rasqberry.one" data-umami-event="Quantego: family footer click" data-umami-event-to="rasqberry-one"><span>RasQberry One</span><small>The original Pi model</small></a>
+    <a class="member" href="https://qutie.org" data-umami-event="Quantego: family footer click" data-umami-event-to="qutie"><span>Qutie</span><small>Palm-sized 3D-printed models</small></a>
+    <a class="member" href="https://qoffee-maker.org" data-umami-event="Quantego: family footer click" data-umami-event-to="qoffee-maker"><span>Qoffee-Maker</span><small>Order coffee with a circuit</small></a>
+    <a class="member" href="https://entangible.org" data-umami-event="Quantego: family footer click" data-umami-event-to="entangible"><span>Entangible</span><small>Hands-on circuit composer for booths</small></a>
+    <a class="member" href="https://certiq.dev" data-umami-event="Quantego: family footer click" data-umami-event-to="certiq"><span>CertiQ</span><small>Qiskit certification prep</small></a>
+    <a class="member" href="https://qubins.org" data-umami-event="Quantego: family footer click" data-umami-event-to="qubins"><span>QuBins</span><small>One-click Qiskit environments</small></a>
+    <a class="member" href="https://doqumentation.org" data-umami-event="Quantego: family footer click" data-umami-event-to="doqumentation"><span>doQumentation</span><small>Executable Qiskit docs, multilingual</small></a>
+    <a class="member" href="https://qamposer.org" data-umami-event="Quantego: family footer click" data-umami-event-to="qamposer"><span>QAMPoser</span><small>Web quantum circuit composer</small></a>
   </div>
   <div class="family-footer-credit">Open source, built by <a href="https://www.linkedin.com/in/JanLahmann">Jan-R. Lahmann</a> and the RasQberry community.</div>
 </footer>
