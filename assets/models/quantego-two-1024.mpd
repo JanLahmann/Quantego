@@ -56207,8 +56207,10 @@
 
 
 0 FILE 3070bpb180.dat
-0 Stub for Studio custom part (no LDraw equivalent)
+0 Tile 1 x 1 with Groove with Print
+0 Studio part with no LDraw equivalent: shown as the plain tile, without the print
 0 BFC CERTIFY CCW
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/3070b.dat
 
 0 FILE softaxleendtip.dat
 0 Stub for Studio custom part (no LDraw equivalent)

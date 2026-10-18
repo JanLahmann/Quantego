@@ -65,13 +65,14 @@ function parseMeta( text ) {
 
     if ( line.startsWith( '0 FILE ' ) ) {
       inMain = false;
-      const f = line.slice( 7 ).trim().toLowerCase();
+      const f = line.slice( 7 ).trim().toLowerCase().replace( /\.dat copy.*$/, '.dat' ); // Studio flexible copies
       awaitDesc = /\.dat$/.test( f ) ? f.split( '/' ).pop() : null;
       continue;
     }
     if ( awaitDesc && line.startsWith( '0 ' ) ) {
       const desc = line.slice( 2 ).trim();
-      if ( desc && ! desc.startsWith( '!' ) && ! /^(Name|Author):/i.test( desc ) ) parts[ awaitDesc ] = desc.replace( / {2,}/g, ' ' );
+      const d = desc.replace( / Copy( \d+)?$/, '' ); // Studio flexible copies: "Hose, Soft Axle 12L Copy"
+      if ( d && ! d.startsWith( '!' ) && ! /^(Name|Author):/i.test( d ) && ! /^\S+$/.test( d ) ) parts[ awaitDesc ] = d.replace( / {2,}/g, ' ' );
       awaitDesc = null;
       continue;
     }
@@ -89,7 +90,35 @@ function parseMeta( text ) {
   }
   if ( spanHasBricks || spanDesc !== null ) captions.push( spanDesc ); // trailing step with no 0 STEP terminator
 
+  // Alias parts ("~Moved to 64567a") borrow their target's description.
+  for ( const [ f, d ] of Object.entries( parts ) ) {
+    const m = d.match( /^~Moved to (\S+)/i );
+    if ( m ) parts[ f ] = parts[ m[ 1 ].toLowerCase() + '.dat' ] || d;
+  }
+
   return { colors, parts, captions };
+}
+
+// One LEGO part = one group. LDrawLoader nests a group per referenced file, so
+// an alias (577b -> 64567a), a part built from other parts (2460, 67329) or a
+// Studio flexible part (27965: two end pieces plus a generated hose) would
+// otherwise count as several bricks. Moves every mesh and line onto its
+// outermost part group; Studio's "27965.dat copy 3" takes the plain name.
+const PART_FILE = /\.dat( copy.*)?$/i;
+function mergePartGroups( root ) {
+  root.updateMatrixWorld( true );
+  const tops = [];
+  root.traverse( o => {
+    if ( ! o.isGroup || ! PART_FILE.test( o.name || '' ) ) return;
+    for ( let a = o.parent; a && a !== root; a = a.parent ) if ( a.isGroup && PART_FILE.test( a.name || '' ) ) return;
+    tops.push( o );
+  } );
+  for ( const top of tops ) {
+    const leaves = [];
+    top.traverse( c => { if ( c.parent !== top && ( c.isMesh || c.isLineSegments || c.isLine ) ) leaves.push( c ); } );
+    for ( const c of leaves ) top.attach( c );
+    top.name = top.name.replace( /\.dat copy.*$/i, '.dat' );
+  }
 }
 
 function titleCase( s ) {
@@ -313,6 +342,7 @@ function createViewer( container, modelUrl ) {
   function onLoad( group ) {
     container.classList.remove( 'is-loading' );
     model = group;
+    mergePartGroups( model );
     numSteps = Math.max( 1, model.userData.numBuildingSteps || 1 );
 
     // LDraw space is Y-down; flip so the model is upright.
@@ -412,9 +442,8 @@ function createViewer( container, modelUrl ) {
     return arr;
   }
 
-  // The colour a brick actually renders in. Alias parts (dish 2654 -> 2654a,
-  // lightsaber 577b -> 64567a) hold their mesh in a subgroup whose colour code
-  // is 16 ("inherit"), so the real colour lives on an ancestor group.
+  // The colour a brick actually renders in. A part placed with colour 16
+  // ("inherit") takes its colour from the submodel that holds it.
   function effColorCode( g ) {
     for ( let a = g; a && a !== scene; a = a.parent ) {
       const code = a.userData && a.userData.colorCode !== undefined ? String( a.userData.colorCode ) : null;
@@ -1843,9 +1872,8 @@ function createViewer( container, modelUrl ) {
 
   // The chandelier: the pearl-gold stages, lightsaber rods and white platters
   // hanging inside the Cryostat submodel of the System Two model. The colour
-  // check walks the whole ancestor chain because alias parts (the lightsabers:
-  // 577b -> 64567a) carry their colour on an outer group while the mesh sits
-  // in a nested "inherit colour" subgroup.
+  // check walks the whole ancestor chain because a part placed with colour 16
+  // ("inherit") gets its colour from the submodel that holds it.
   let chandelier = null;
   function chandelierBricks() {
     if ( ! chandelier ) {
@@ -1994,7 +2022,7 @@ function createCompareViewer( container, urls ) {
   urls.forEach( ( url, i ) => {
     const loader = new LDrawLoader();
     loader.smoothNormals = false; // keep the combined (incl. 1024) scene snappy
-    loader.load( url, g => { loaded[ i ] = g; if ( loaded.every( Boolean ) ) layout(); },
+    loader.load( url, g => { mergePartGroups( g ); loaded[ i ] = g; if ( loaded.every( Boolean ) ) layout(); },
       undefined, err => console.error( 'LDraw compare load failed for', url, err ) );
   } );
 
