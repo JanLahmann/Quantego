@@ -1,11 +1,7 @@
-# Quantego
-
-## Quantego is a family of LEGO models of IBM Quantum Computers
-
 The first version of Quantego was created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
-  <img src="First-Quantego.jpg" alt="Quantego" width="300"/>
+  <img src="First-Quantego.webp" alt="The first Quantego, a LEGO model of IBM Quantum System One, next to a bag of white LEGO bricks" width="300" height="225"/>
 </p>
 
 Currently, we feature three different versions: a LEGO model of IBM Quantum System *One* (49 bricks), a model of IBM Quantum System *Two* (105 bricks), and a much more sophisticated, high-end model of IBM Quantum System Two (1024 bricks).
@@ -23,13 +19,13 @@ All three models shown side by side at the same physical scale. Drag to rotate, 
 ## IBM Quantum System One
 
 <p align="center">
-  <img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego build animation" width="450"/>
+  <video src="Quantego-One/Quantego-One-v05-animation.mp4" poster="Quantego-One/Quantego-One-v05-animation-poster.webp" width="450" height="338" autoplay loop muted playsinline title="Quantego System One build animation"></video><img src="Quantego-One/Quantego-One-v05-animation.gif" alt="Quantego System One build animation" width="450" height="338" loading="lazy"/>
 </p>
 
 <p align="center">
-  <img src="Quantego-One/Quantego-One-v05.png" alt="Quantego" width="250"/>
-  <img src="Quantego-One/Quantego-One-v05.jpg" alt="Quantego" width="250"/>
-  <img src="Quantego-One/black-2x4.JPG" alt="Quantego" width="250"/>
+  <img src="Quantego-One/Quantego-One-v05-render.webp" alt="Rendering of the Quantego System One LEGO model" width="250" height="188" loading="lazy"/>
+  <img src="Quantego-One/Quantego-One-v05.webp" alt="Quantego System One on a pile of black LEGO bricks" width="250" height="167" loading="lazy"/>
+  <img src="Quantego-One/black-2x4.webp" alt="A pile of black 2x4 LEGO bricks" width="250" height="167" loading="lazy"/>
 </p>
 
 <div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
@@ -42,7 +38,7 @@ Build instructions can be found <a href="Quantego-One/Quantego-One-v05-instructi
 ### Parts List
 
 <p align="center">
-  <img src="Quantego-One/Quantego-One-v05-parts.png" alt="Quantego" width="450"/>
+  <img src="Quantego-One/Quantego-One-v05-parts.webp" alt="Parts list of Quantego System One" width="450" height="404" loading="lazy"/>
 </p>
 
 ### Digital design
@@ -54,7 +50,7 @@ The digital design file is available <a href="Quantego-One/Quantego-One-v05.io" 
 ## IBM Quantum System Two
 
 <p align="center">
-  <img src="Quantego-Two/Quantego-Two.png" alt="Quantego build animation" width="450"/>
+  <img src="Quantego-Two/Quantego-Two.webp" alt="Rendering of the Quantego System Two LEGO model" width="450" height="289" loading="lazy"/>
 </p>
 
 <div class="viewer" data-model="/assets/models/quantego-two.mpd" data-ar="/assets/models/quantego-two.glb" data-ar-ios="/assets/models/quantego-two.usdz"></div>
@@ -71,7 +67,7 @@ Build instructions can be found <a href="Quantego-Two/Quantego-Two-instructions.
 ### Parts List
 
 <p align="center">
-  <img src="Quantego-Two/Quantego-Two-parts.png" alt="Quantego" width="450"/>
+  <img src="Quantego-Two/Quantego-Two-parts.webp" alt="Parts list of Quantego System Two" width="450" height="230" loading="lazy"/>
 </p>
 
 ### Digital design
@@ -85,7 +81,7 @@ The digital design file is available <a href="Quantego-Two/Quantego-Two.io" data
 [Luca Crippa](https://www.linkedin.com/in/luca-crippa-a29a98a2/) has designed a sophisticated and beautiful 1024-brick model of IBM Quantum System Two.
 
 <p align="center">
-  <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.png" alt="Quantego" width="450"/>
+  <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.webp" alt="Rendering of the 1024-brick Quantego System Two" width="450" height="338" loading="lazy"/>
 </p>
 
 <div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
@@ -94,15 +90,15 @@ You'll find more renders of the 1024-brick model in the [Renders](https://github
 
 Here are some photos of the built model; more will be posted in the [Photos](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Photos) folder.
 <p align="center">
-  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo1.jpg" alt="Quantego" width="250"/>
-  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo2.jpg" alt="Quantego" width="250"/>
+  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo1.webp" alt="Photo of the built 1024-brick Quantego System Two" width="250" height="141" loading="lazy"/>
+  <img src="Quantego-Two-1024/Photos/Quantego-Two-1024_photo2.webp" alt="Close-up photo of the built 1024-brick model" width="250" height="141" loading="lazy"/>
 </p>
 
 ### Build instructions 
 Build instructions can be found <a href="Quantego-Two-1024/Quantego-Two-1024_v3_instructions.pdf" data-umami-event="Quantego: file download" data-umami-event-kind="pdf" data-umami-event-file="Quantego-Two-1024_v3_instructions.pdf">here</a>.
 
 ### Parts List
-Parts list can be found at the end of the build instructions file. You can also download <a href="Quantego-Two-1024/Quantego-Two-1024_v3_PAB.json" data-umami-event="Quantego: file download" data-umami-event-kind="pab-json" data-umami-event-file="Quantego-Two-1024_v3_PAB.json">this json</a> and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
+Parts list can be found at the end of the build instructions file. You can also download <a href="Quantego-Two-1024/Quantego-Two-1024_v3_PAB.json" data-umami-event="Quantego: file download" data-umami-event-kind="pab" data-umami-event-file="Quantego-Two-1024_v3_PAB.json">this json</a> and upload it on the official Lego Pick a Brick website of your Country ([example](https://www.lego.com/en-us/pick-and-build/pick-a-brick)) to purchase all the parts directly from Lego. Just upload the json by clicking on the "Upload List" button.
 
 ### Digital design
 

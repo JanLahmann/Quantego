@@ -1,6 +1,8 @@
 <!-- Interactive 3D viewers and the quantum-circuit simulator. Loaded from the
      Jekyll layout so README.md stays clean when rendered on github.com, which
      strips <script> tags but leaks their content as text. -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/css/viewer.css">
 <script type="importmap">
 { "imports": {
@@ -10,5 +12,19 @@
 </script>
 <script type="module" src="/assets/js/ldraw-viewer.js"></script>
 
-<!-- Umami analytics (shared Fun with Quantum family property) -->
-<script defer src="https://cloud.umami.is/script.js" data-website-id="97f347ac-e7ba-4be3-b26f-ab4b328bdbf2" data-domains="quantego.org"></script>
+<!-- Umami analytics (shared Fun with Quantum family property). The first script is the
+     family's standard snippet: ?notrack turns tracking off in this browser, ?track turns it
+     back on, and bots and headless browsers send nothing. -->
+<script>(function(){try{var q=location.search;if(/[?&]notrack\b/.test(q))localStorage.setItem('umami.disabled','1');if(/[?&]track\b/.test(q))localStorage.removeItem('umami.disabled')}catch(e){}window.fwqUmamiBeforeSend=function(t,p){var n=navigator;return(n.webdriver||/HeadlessChrome|bot|crawl|spider|Lighthouse|PageSpeed/i.test(n.userAgent))?false:p}})();</script>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="97f347ac-e7ba-4be3-b26f-ab4b328bdbf2" data-domains="quantego.org" data-before-send="fwqUmamiBeforeSend"></script>
+<script>
+  // "Quantego: outbound click" (host) for links to other sites, e.g. BrickLink, LEGO,
+  // GitHub, IBM. Links that carry their own event (the family footer) are left to it.
+  document.addEventListener( 'click', function ( e ) {
+    var a = e.target.closest && e.target.closest( 'a[href]' );
+    if ( ! a || a.hasAttribute( 'data-umami-event' ) || ! window.umami ) return;
+    var u; try { u = new URL( a.href, location.href ); } catch ( err ) { return; }
+    if ( ! /^https?:$/.test( u.protocol ) || u.host === location.host ) return;
+    window.umami.track( 'Quantego: outbound click', { host: u.host } );
+  }, true );
+</script>
