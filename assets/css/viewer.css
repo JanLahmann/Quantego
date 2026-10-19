@@ -1,3 +1,10 @@
+/* README images and the build video carry width and height (no layout shift while they
+   load); keep their aspect ratio when the column is narrower. */
+#main-content p > img, #main-content p > video { max-width: 100%; height: auto; }
+/* The GIF after the build video is for github.com, which drops <video>; hidden and lazy,
+   it is never downloaded here. */
+#main-content video + img { display: none; }
+
 .viewer, .viewer-compare {
   position: relative;
   width: 100%;
