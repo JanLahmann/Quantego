@@ -1,23 +1,48 @@
 # IndexNow (Fun with Quantum family, family/indexnow/README.md): after each Pages deploy, tell Bing,
-# Yandex & co. that quantego.org changed. Pages builds main itself (no deploy workflow here), so
-# this runs when the "pages build and deployment" run has finished.
+# Yandex & co. that quantego.org changed. Pages builds main itself (no deploy workflow here, and
+# workflow_run does not fire for its dynamic "pages build and deployment" run), so on each push to
+# main this waits until Pages has built that commit, then sends.
 # all: the sitemap gives the homepage no <lastmod> (jekyll-sitemap) and every PDF the build time,
 # so "changed since yesterday" would miss the page itself; the site has five URLs and few deploys.
 # The key is public by design: https://quantego.org/1332bdd6c02656e00c7bbf9e5556316e.txt
 name: IndexNow
 
 on:
-  workflow_run:
-    workflows: [pages build and deployment]
-    types: [completed]
+  push:
     branches: [main]
   workflow_dispatch:
 
 permissions: {}
 
+# A newer push supersedes a run that is still waiting.
+concurrency:
+  group: indexnow
+  cancel-in-progress: true
+
 jobs:
+  pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: read
+    steps:
+      - name: Wait until Pages has built this commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+        run: |
+          for i in $(seq 1 56); do
+            b=$(gh api "repos/$REPO/pages/builds/latest" --jq '"\(.status) \(.commit)"' || true)
+            echo "Pages build: $b"
+            [ "$b" = "built $SHA" ] && exit 0
+            [ "$b" = "errored $SHA" ] && exit 1
+            sleep 15
+          done
+          echo "Pages has not built $SHA within 14 minutes"; exit 1
+
   indexnow:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    needs: pages
     uses: JanLahmann/Fun-with-Quantum/.github/workflows/indexnow.yml@master
     with:
       site: https://quantego.org
