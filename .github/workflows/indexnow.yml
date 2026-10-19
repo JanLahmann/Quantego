@@ -1,0 +1,25 @@
+# IndexNow (Fun with Quantum family, family/indexnow/README.md): after each Pages deploy, tell Bing,
+# Yandex & co. that quantego.org changed. Pages builds main itself (no deploy workflow here), so
+# this runs when the "pages build and deployment" run has finished.
+# all: the sitemap gives the homepage no <lastmod> (jekyll-sitemap) and every PDF the build time,
+# so "changed since yesterday" would miss the page itself; the site has five URLs and few deploys.
+# The key is public by design: https://quantego.org/1332bdd6c02656e00c7bbf9e5556316e.txt
+name: IndexNow
+
+on:
+  workflow_run:
+    workflows: [pages build and deployment]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  indexnow:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    uses: JanLahmann/Fun-with-Quantum/.github/workflows/indexnow.yml@master
+    with:
+      site: https://quantego.org
+      key: 1332bdd6c02656e00c7bbf9e5556316e
+      all: true
