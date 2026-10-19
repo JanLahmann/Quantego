@@ -1792,7 +1792,7 @@ function createViewer( container, modelUrl ) {
         // Look inside the cryostat: everything else fades to near-transparent
         // while the golden chandelier lights up amber — in the real machine,
         // that is where the circuit actually runs.
-        if ( ! model || ghost || stepMode ) return;
+        if ( ! model || ghost ) return;
         // Nothing may hide the flash: a running build assembles instantly
         // (loop disarmed) and an open tour closes. The camera eases back to
         // the default framing — but only if the user hasn't deliberately
@@ -1811,6 +1811,16 @@ function createViewer( container, modelUrl ) {
           viewAdjusted = false; // back at the default framing
         }
         if ( pulseRestore ) pulseRestore();
+        const DUR = 1800;
+        // Steps and brick-by-brick stepping show a partial build, often without
+        // the chandelier yet: the finished machine shows for the flash and the
+        // current step comes back afterwards. A playing step player waits.
+        const inSteps = stepMode;
+        if ( inSteps ) {
+          clearStepFlash(); // its tint would keep the new bricks from fading
+          for ( const g of ensureBrickData() ) g.visible = true;
+          if ( stepPlayer ) stepPlayer.nextAt = performance.now() + DUR + STEP_PLAY_MS;
+        }
         const chan = chandelierBricks();
         const chanSet = new Set( chan );
         const rest = ensureBrickData().filter( g => ! chanSet.has( g ) );
@@ -1827,13 +1837,16 @@ function createViewer( container, modelUrl ) {
               .forEach( m => { if ( m && 'emissiveIntensity' in m ) mats.add( m ); } );
           }
         }
-        const DUR = 1800;
         if ( ! reduceMotion ) pulseFx = { mats: [ ...mats ], base: GLOW_BASE, start: performance.now(), dur: DUR };
         const restore = () => {
           glow();
           fade();
           for ( const m of mats ) m.emissiveIntensity = GLOW_BASE; // clones are cached and reused
           pulseFx = null;
+          if ( inSteps && stepMode ) {
+            if ( curBrick !== null ) setBrick( curBrick );
+            else setStep( curStep );
+          }
         };
         pulseRestore = restore;
         setTimeout( () => { if ( pulseRestore === restore ) { restore(); pulseRestore = null; } }, DUR );
