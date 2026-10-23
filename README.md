@@ -1,7 +1,7 @@
 The first version of Quantego was created by Mathilda Lahmann, as mentioned on LinkedIn in [December 2021](https://www.linkedin.com/feed/update/urn:li:activity:6875070856679231488/) and in [April 2022](https://www.linkedin.com/feed/update/urn:li:activity:6920362102687723520/).
 
 <p align="center">
-  <img src="First-Quantego.webp" alt="The first Quantego, a LEGO model of IBM Quantum System One, next to a bag of white LEGO bricks" width="300" height="225"/>
+  <img src="First-Quantego.webp" alt="The first Quantego, a LEGO model of IBM Quantum System One, next to a bag of white LEGO bricks" width="300" height="225" fetchpriority="high"/>
 </p>
 
 Currently, we feature three different versions: a LEGO model of IBM Quantum System *One* (49 bricks), a model of IBM Quantum System *Two* (105 bricks), and a much more sophisticated, high-end model of IBM Quantum System Two (1024 bricks).
@@ -13,7 +13,7 @@ The instructions, digital pictures, and animations were created with [BrickLink 
 
 All three models shown side by side at the same physical scale. Drag to rotate, scroll or pinch to zoom.
 
-<div class="viewer-compare" data-models="/assets/models/quantego-one.mpd,/assets/models/quantego-two.mpd,/assets/models/quantego-two-1024.mpd"></div>
+<div class="viewer-compare" data-models="/assets/models/quantego-one.mpd.txt,/assets/models/quantego-two.mpd.txt,/assets/models/quantego-two-1024.mpd.txt"></div>
 
 
 ## IBM Quantum System One
@@ -28,7 +28,7 @@ All three models shown side by side at the same physical scale. Drag to rotate, 
   <img src="Quantego-One/black-2x4.webp" alt="A pile of black 2x4 LEGO bricks" width="250" height="167" loading="lazy"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-one.mpd" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
+<div class="viewer" data-model="/assets/models/quantego-one.mpd.txt" data-ar="/assets/models/quantego-one.glb" data-ar-ios="/assets/models/quantego-one.usdz"></div>
 
 💡 **This 3D viewer is interactive — like all of them on this page.** Drag to rotate (a click on the background pauses or resumes the slow spin) and step through the build with the ‹ › buttons — they place or remove one brick at a time. Switch the play bar from **Bricks** to **Steps** and ▶, the progress bar and ‹ › work on whole building steps instead: every step highlights its new bricks and lists exactly which parts to add, like interactive build instructions — and the fastest way to jump to a specific step, especially in the 1024-brick model. Click any brick to identify it, open the 🧱 parts list, or take the ℹ️ tour to learn what each part of a real quantum computer does. The 📸 button saves a snapshot, and 🔗 copies a link to your exact view.
 
@@ -53,7 +53,7 @@ The digital design file is available <a href="Quantego-One/Quantego-One-v05.io" 
   <img src="Quantego-Two/Quantego-Two.webp" alt="Rendering of the Quantego System Two LEGO model" width="450" height="289" loading="lazy"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-two.mpd" data-ar="/assets/models/quantego-two.glb" data-ar-ios="/assets/models/quantego-two.usdz"></div>
+<div class="viewer" data-model="/assets/models/quantego-two.mpd.txt" data-ar="/assets/models/quantego-two.glb" data-ar-ios="/assets/models/quantego-two.usdz"></div>
 
 ### Run a quantum circuit
 
@@ -84,7 +84,7 @@ The digital design file is available <a href="Quantego-Two/Quantego-Two.io" data
   <img src="Quantego-Two-1024/Renders/Quantego-Two-1024_5.webp" alt="Rendering of the 1024-brick Quantego System Two" width="450" height="338" loading="lazy"/>
 </p>
 
-<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
+<div class="viewer" data-model="/assets/models/quantego-two-1024.mpd.txt" data-smooth-normals="false" data-ar="/assets/models/quantego-two-1024.glb" data-ar-ios="/assets/models/quantego-two-1024.usdz"></div>
 
 You'll find more renders of the 1024-brick model in the [Renders](https://github.com/JanLahmann/Quantego/tree/main/Quantego-Two-1024/Renders) folder.
 
@@ -114,7 +114,7 @@ A qubit does not have to choose between 0 and 1. Until it is measured, it can be
 
 Here is our LEGO take on it. The model below is System One *and* System Two at the same time, in an equal superposition. Click it to measure: it collapses to one of the two machines, each with 50% probability, and stays that way until the next click (or the glowing **0/1** button) prepares a new superposition.
 
-<div class="viewer" data-model="/assets/models/quantego-two.mpd" data-superposition="true"></div>
+<div class="viewer" data-model="/assets/models/quantego-two.mpd.txt" data-superposition="true"></div>
 
 
 ## Kits

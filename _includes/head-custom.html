@@ -4,9 +4,16 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/css/viewer.css">
+<!-- The theme's header font, without blocking the first paint (the theme's own
+     CSS @import of it is dropped in _sass/jekyll-theme-architect.scss). -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Architects+Daughter&display=swap" media="print" onload="this.media='all'">
+<!-- Minified builds: three.module.min.js ships with three; jsDelivr minifies the addons. -->
 <script type="importmap">
 { "imports": {
-  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+  "three/addons/controls/OrbitControls.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.min.js",
+  "three/addons/loaders/LDrawLoader.js": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/LDrawLoader.min.js",
   "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
 } }
 </script>
