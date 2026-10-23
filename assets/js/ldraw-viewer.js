@@ -146,8 +146,8 @@ function parseShareHash() {
 const pendingShare = parseShareHash();
 
 // ---------------------------------------------------------------------------
-// "Anatomy of a quantum computer" tour content, keyed by model slug (the .mpd
-// basename). Every stop anchors to actual bricks so the dot stays glued to
+// "Anatomy of a quantum computer" tour content, keyed by model slug (the model
+// file's basename). Every stop anchors to actual bricks so the dot stays glued to
 // its component while the model rotates: `group` matches a named Studio
 // submodel, `color` matches LDraw colour codes (checked along the whole
 // ancestor chain, so alias parts count), both filters combine, and `pick`
@@ -254,7 +254,9 @@ function createViewer( container, modelUrl ) {
   // Honour the OS "reduce motion" setting: no auto-spin, no auto-play, no drop.
   const reduceMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
-  const slug = ( modelUrl.match( /([^/]+)\.[a-z]+$/i ) || [] )[ 1 ] || modelUrl;
+  // "quantego-two" from /assets/models/quantego-two.mpd.txt. The models carry a
+  // .txt suffix so GitHub Pages serves them gzipped (3.4 MB -> 0.5 MB for 1024).
+  const slug = ( modelUrl.match( /([^/.]+)(\.[a-z]+)+$/i ) || [] )[ 1 ] || modelUrl;
 
   // The dedicated superposition viewer (data-superposition): it auto-enters
   // the superposed state instead of playing the build animation, carries the
@@ -2329,15 +2331,24 @@ function initAll() {
       if ( ! entry.isIntersecting ) continue;
       const el = entry.target;
       observer.unobserve( el );
-      if ( el.dataset.models ) {
-        createCompareViewer( el, el.dataset.models.split( ',' ).map( s => s.trim() ).filter( Boolean ) );
-      } else {
-        createViewer( el, el.dataset.model );
-      }
+      createViewer( el, el.dataset.model );
     }
   }, { rootMargin: '200px' } );
 
-  document.querySelectorAll( '.viewer[data-model], .viewer-compare[data-models]' ).forEach( el => lazy.observe( el ) );
+  document.querySelectorAll( '.viewer[data-model]' ).forEach( el => lazy.observe( el ) );
+
+  // The comparison builds all three models, the 1024-brick one included (seconds
+  // of main-thread work on a phone). It sits just below the first screen, so it
+  // starts once a quarter of it is in view, not 200 px ahead like the others.
+  const lazyCompare = new IntersectionObserver( ( entries, observer ) => {
+    for ( const entry of entries ) {
+      if ( ! entry.isIntersecting ) continue;
+      const el = entry.target;
+      observer.unobserve( el );
+      createCompareViewer( el, el.dataset.models.split( ',' ).map( s => s.trim() ).filter( Boolean ) );
+    }
+  }, { threshold: 0.25 } );
+  document.querySelectorAll( '.viewer-compare[data-models]' ).forEach( el => lazyCompare.observe( el ) );
 
   // A shared deep link must instantiate its viewer even before it's scrolled to.
   if ( pendingShare ) {
