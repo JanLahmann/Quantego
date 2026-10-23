@@ -175,8 +175,11 @@ function createSim( container ) {
   }
 
   // --- circuit grid ---------------------------------------------------------
+  // A group of plain buttons, one group per qubit wire. role="grid" would
+  // promise row/gridcell children and arrow-key navigation, which this isn't.
   const grid = el( 'div', 'qsim-grid' );
-  grid.setAttribute( 'role', 'grid' );
+  grid.setAttribute( 'role', 'group' );
+  grid.setAttribute( 'aria-label', 'Circuit' );
 
   function buildGrid() {
     grid.innerHTML = '';
@@ -184,6 +187,8 @@ function createSim( container ) {
     circuit = Array.from( { length: qubits }, () => new Array( COLS ).fill( null ) );
     for ( let q = 0; q < qubits; q ++ ) {
       const row = el( 'div', 'qsim-wire' );
+      row.setAttribute( 'role', 'group' );
+      row.setAttribute( 'aria-label', `qubit ${q}` );
       row.appendChild( el( 'span', 'qsim-wirelabel', wireName( q ) ) );
       cells[ q ] = [];
       for ( let col = 0; col < COLS; col ++ ) {
