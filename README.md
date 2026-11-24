@@ -49,6 +49,8 @@ The digital design file is the <a href="Quantego-One/Quantego-One-v05.io" data-u
 
 ## IBM Quantum System Two
 
+Designed by Robert and Jan-R. Lahmann.
+
 <p align="center">
   <img src="Quantego-Two/Quantego-Two.webp" alt="Rendering of the Quantego System Two LEGO model" width="450" height="289" loading="lazy"/>
 </p>
