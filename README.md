@@ -134,6 +134,10 @@ LEGO and BrickLink are trademarks of the LEGO Group. IBM and IBM Quantum are tra
 
 The interactive 3D viewers are built with [three.js](https://threejs.org) (`LDrawLoader` and `OrbitControls`) and use the [LDraw™ Parts Library](https://www.ldraw.org) (parts geometry is licensed [CC BY](https://www.ldraw.org/docs-main/licenses/legal-info.html)). Augmented-reality viewing is powered by [&lt;model-viewer&gt;](https://modelviewer.dev). The quantum circuit simulator is a self-contained statevector simulation that runs entirely in your browser. The models were designed in [BrickLink Studio](https://www.bricklink.com/v3/studio/download.page).
 
+### License
+
+The models (BrickLink Studio and LDraw files), build instructions, parts lists, renders and photos are licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). The code (the 3D viewer and the quantum circuit simulator) is licensed under the [Apache License 2.0](LICENSE).
+
 <!-- FWQ-FAMILY:START format=html — generated from family.json in JanLahmann/Fun-with-Quantum, do not edit by hand -->
 <footer class="family-footer">
   <div class="family-footer-tagline">GOD DOES PLAY DICE. COME PLAY, BUILD, LEARN.</div>
