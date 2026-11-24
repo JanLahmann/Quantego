@@ -741,7 +741,7 @@
 0 !AVATAR CATEGORY "Znap" DESCRIPTION "Znap" PART 1 0 0  0 1 0  0 0 1 "32210.dat" 
 0 Untitled Model
 0 Name:  Quantego-Two
-0 Author:  
+0 Author: Robert and Jan-R. Lahmann
 0 CustomBrick
 0 FlexibleBrickControlPointUnitLength -1
 0 NumOfBricks:  99
@@ -790,7 +790,7 @@
 0 FILE Wall
 0 Wall
 0 Name:  Wall
-0 Author:  
+0 Author: Robert and Jan-R. Lahmann
 0 CustomBrick
 0 FlexibleBrickControlPointUnitLength -1
 0 NumOfBricks:  24
@@ -827,7 +827,7 @@
 0 FILE Cryostat
 0 Cryostat
 0 Name:  Cryostat
-0 Author:  
+0 Author: Robert and Jan-R. Lahmann
 0 CustomBrick
 0 FlexibleBrickControlPointUnitLength -1
 0 NumOfBricks:  20
@@ -861,7 +861,7 @@
 0 FILE Rack
 0 Rack
 0 Name:  Rack
-0 Author:  
+0 Author: Robert and Jan-R. Lahmann
 0 CustomBrick
 0 FlexibleBrickControlPointUnitLength -1
 0 NumOfBricks:  7
